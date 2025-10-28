@@ -25,6 +25,7 @@ public class EstadisticasServiceImpl implements EstadisticasService {
     private final UsuarioRepository usuarioRepository;
     private final CategoriaRepository categoriaRepository;
     private final DetallePedidoRepository detallePedidoRepository;
+    private final EstadisticasRepository estadisticasRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -118,27 +119,7 @@ public class EstadisticasServiceImpl implements EstadisticasService {
     public List<Object[]> getVentasMensuales(int año) {
         try {
 
-            String sql = """
-                SELECT MONTH(p.fecha_pedido) as mes, 
-                       COALESCE(SUM(p.total), 0) as total_ventas,
-                       COUNT(p.id) as total_pedidos
-                FROM pedidos p
-                WHERE YEAR(p.fecha_pedido) = ?1 
-                  AND p.estado = 'ENTREGADO'
-                GROUP BY MONTH(p.fecha_pedido)
-                ORDER BY mes
-                """;
-
-
-            return List.of(
-                    new Object[]{1, new BigDecimal("15000.00"), 15L},
-                    new Object[]{2, new BigDecimal("18000.00"), 18L},
-                    new Object[]{3, new BigDecimal("22000.00"), 22L},
-                    new Object[]{4, new BigDecimal("19000.00"), 19L},
-                    new Object[]{5, new BigDecimal("25000.00"), 25L},
-                    new Object[]{6, new BigDecimal("28000.00"), 28L}
-            );
-
+            return estadisticasRepository.getVentasMensuales(año);
         } catch (Exception e) {
             log.error("Error al obtener ventas mensuales: {}", e.getMessage());
             return List.of();
@@ -149,7 +130,8 @@ public class EstadisticasServiceImpl implements EstadisticasService {
     @Transactional(readOnly = true)
     public List<Object[]> getProductosPorCategoria() {
         try {
-            return categoriaRepository.getProductosPorCategoria();
+
+            return estadisticasRepository.getProductosPorCategoria();
         } catch (Exception e) {
             log.error("Error al obtener productos por categoría: {}", e.getMessage());
             return List.of();
@@ -160,9 +142,9 @@ public class EstadisticasServiceImpl implements EstadisticasService {
     @Transactional(readOnly = true)
     public List<Object[]> getTopProductosMasVendidos(int limite) {
         try {
-            return detallePedidoRepository.findProductosMasVendidos().stream()
-                    .limit(limite)
-                    .toList();
+
+            List<Object[]> resultados = estadisticasRepository.getTop10ProductosMasVendidos();
+            return resultados.stream().limit(limite).toList();
         } catch (Exception e) {
             log.error("Error al obtener top productos más vendidos: {}", e.getMessage());
             return List.of();
@@ -233,7 +215,7 @@ public class EstadisticasServiceImpl implements EstadisticasService {
 
         } catch (Exception e) {
             log.error("Error al obtener pedidos por estado: {}", e.getMessage());
-            // Inicializar con ceros
+
             for (com.example.tiendaperfericos.entity.emun.EstadoPedido estado :
                     com.example.tiendaperfericos.entity.emun.EstadoPedido.values()) {
                 pedidosPorEstado.put(estado.name(), 0L);

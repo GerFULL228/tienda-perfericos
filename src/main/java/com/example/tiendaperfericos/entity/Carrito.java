@@ -32,13 +32,18 @@ public class Carrito {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
-    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ItemCarrito> items = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         fechaCreacion = LocalDateTime.now();
         fechaActualizacion = LocalDateTime.now();
+
+        if (items == null) {
+            items = new ArrayList<>();
+        }
     }
 
     @PreUpdate
@@ -46,13 +51,23 @@ public class Carrito {
         fechaActualizacion = LocalDateTime.now();
     }
 
+
     public BigDecimal getTotal() {
+        if (items == null || items.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
         return items.stream()
                 .map(ItemCarrito::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+
     public void agregarItem(Producto producto, int cantidad) {
+        // Asegurar que items no sea null
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+
         ItemCarrito itemExistente = items.stream()
                 .filter(item -> item.getProducto().getId().equals(producto.getId()))
                 .findFirst()
@@ -71,11 +86,27 @@ public class Carrito {
         }
     }
 
+
     public void eliminarItem(Long productoId) {
-        items.removeIf(item -> item.getProducto().getId().equals(productoId));
+        if (items != null) {
+            items.removeIf(item -> item.getProducto().getId().equals(productoId));
+        }
     }
 
+
     public void limpiarCarrito() {
-        items.clear();
+        if (items != null) {
+            items.clear();
+        }
+    }
+
+
+    public int getTotalItems() {
+        if (items == null || items.isEmpty()) {
+            return 0;
+        }
+        return items.stream()
+                .mapToInt(ItemCarrito::getCantidad)
+                .sum();
     }
 }

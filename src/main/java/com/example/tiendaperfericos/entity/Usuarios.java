@@ -34,6 +34,11 @@ public class Usuarios {
     @Column(nullable = false)
     private String apellido;
 
+
+    private String direccion;
+
+    private String telefono;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;

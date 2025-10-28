@@ -1,10 +1,234 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Gestión de Productos - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+<div layout:fragment="content">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Gestión de Productos</h1>
+                    <p class="text-gray-600 mt-2">Administra el inventario de PeriTech</p>
+                </div>
+                <button onclick="abrirModal()"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold">
+                    <i class="fas fa-plus mr-2"></i>Nuevo Producto
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Mensajes -->
+    <div class="container mx-auto px-4 mt-6">
+        <div th:if="${mensaje}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <!-- Tabla de Productos -->
+    <div class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Lista de Productos</h2>
+                <p class="text-gray-600 text-sm mt-1" th:text="'Total: ' + ${productos.size()} + ' productos'"></p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Producto
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Categoría
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Precio
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Stock
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Estado
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="producto : ${productos}" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <img th:src="${producto.imagenUrl != null} ? ${producto.imagenUrl} : '/images/placeholder-product.jpg'"
+                                         alt="Producto" class="h-10 w-10 rounded-lg object-cover">
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${producto.nombre}"></div>
+                                    <div class="text-sm text-gray-500" th:text="${producto.descripcion != null} ? ${#strings.abbreviate(producto.descripcion, 50)} : 'Sin descripción'"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-900" th:text="${producto.categoria.nombre}"></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm font-semibold text-blue-600"
+                                      th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2)}"></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:class="${producto.stock > 10} ?
+                                               'bg-green-100 text-green-800' :
+                                               ${producto.stock > 0} ?
+                                               'bg-yellow-100 text-yellow-800' :
+                                               'bg-red-100 text-red-800'"
+                                      class="px-2 py-1 rounded-full text-xs font-semibold"
+                                      th:text="${producto.stock} + ' unidades'">
+                                </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${producto.activo}"
+                                      class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">
+                                    Activo
+                                </span>
+                            <span th:unless="${producto.activo}"
+                                  class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">
+                                    Inactivo
+                                </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
+                               class="text-blue-600 hover:text-blue-900 mr-3">
+                                <i class="fas fa-edit mr-1"></i>Editar
+                            </a>
+                            <form th:action="@{/admin/productos/eliminar/{id}(id=${producto.id})}"
+                                  method="post" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar este producto?')">
+                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-trash mr-1"></i>Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${productos == null || productos.empty}" class="text-center py-12">
+                <i class="fas fa-box text-gray-400 text-6xl mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay productos</h3>
+                <p class="text-gray-500 mb-4">Comienza agregando tu primer producto al inventario.</p>
+                <button onclick="abrirModal()"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                    <i class="fas fa-plus mr-2"></i>Agregar Producto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nuevo Producto -->
+    <div id="modalProducto" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center pb-3">
+                <h3 class="text-2xl font-bold text-gray-800">Nuevo Producto</h3>
+                <button onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <form th:action="@{/admin/productos/guardar}" method="post" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                        <input type="text" name="nombre" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
+                        <select name="categoria.id" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Seleccionar categoría</option>
+                            <option th:each="categoria : ${categorias}"
+                                    th:value="${categoria.id}"
+                                    th:text="${categoria.nombre}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Precio *</label>
+                        <input type="number" name="precio" step="0.01" min="0" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Stock *</label>
+                        <input type="number" name="stock" min="0" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    <textarea name="descripcion" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">URL de Imagen</label>
+                    <input type="url" name="imagenUrl"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="https://ejemplo.com/imagen.jpg">
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" name="activo" id="activo" checked
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="activo" class="ml-2 block text-sm text-gray-700">Producto activo</label>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="cerrarModal()"
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-save mr-2"></i>Guardar Producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="scripts">
+    function abrirModal() {
+        document.getElementById('modalProducto').classList.remove('hidden');
+    }
+
+    function cerrarModal() {
+        document.getElementById('modalProducto').classList.add('hidden');
+    }
+
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalProducto');
+        if (event.target === modal) {
+            cerrarModal();
+        }
+    }
+</script>
 </body>
 </html>

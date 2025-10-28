@@ -1,119 +1,510 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - PeriTech</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-<!-- Mismo header y sidebar que dashboard.html -->
-<header th:replace="user/dashboard :: header"></header>
+<body>
+<div layout:fragment="content">
+    <!-- Header -->
+    <div class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Mi Perfil</h1>
+                    <p class="text-gray-600 mt-2">Gestiona tu información personal y preferencias</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/user/dashboard}"
+                       class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="container mx-auto px-4 py-8">
-    <div class="flex">
-        <aside th:replace="user/dashboard :: aside"></aside>
+    <!-- Mensajes -->
+    <div class="container mx-auto px-4 mt-6">
+        <div th:if="${mensaje}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
 
-        <main class="flex-1">
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <h1 class="text-2xl font-bold text-gray-800 mb-6">Mi Perfil</h1>
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Información del Usuario -->
-                    <div class="lg:col-span-2">
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Información Personal</h2>
-
-                            <div class="space-y-4">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                                        <p class="text-gray-900" th:text="${usuario.nombre}"></p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                                        <p class="text-gray-900" th:text="${usuario.apellido}"></p>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <p class="text-gray-900" th:text="${usuario.email}"></p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-                                    <p class="text-gray-900" th:text="${usuario.rol.nombre}"></p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                                    <span th:if="${usuario.activo}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Activo
-                                        </span>
-                                    <span th:unless="${usuario.activo}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            Inactivo
-                                        </span>
-                                </div>
-                            </div>
-
-                            <div class="mt-6">
-                                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                                    <i class="fas fa-edit mr-2"></i>Editar Perfil
-                                </button>
-                            </div>
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Sidebar de Navegación -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+                    <!-- Información de Usuario -->
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-blue-600 text-2xl"></i>
                         </div>
+                        <h3 class="font-semibold text-gray-800" th:text="${usuario.nombre + ' ' + usuario.apellido}"></h3>
+                        <p class="text-gray-600 text-sm" th:text="${usuario.email}"></p>
+                        <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-2"
+                              th:text="${usuario.rol.nombre}"></span>
                     </div>
 
-                    <!-- Tarjeta de Resumen -->
-                    <div class="space-y-6">
-                        <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
-                            <h3 class="text-lg font-semibold text-blue-800 mb-2">Resumen de Cuenta</h3>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-blue-700">Pedidos Totales:</span>
-                                    <span class="font-semibold">15</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-blue-700">Miembro desde:</span>
-                                    <span class="font-semibold">2024</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-blue-700">Última actividad:</span>
-                                    <span class="font-semibold">Hoy</span>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Menú de Navegación -->
+                    <nav class="space-y-2">
+                        <a href="#informacion-personal"
+                           class="flex items-center space-x-3 p-3 text-blue-600 bg-blue-50 rounded-lg font-semibold">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Información Personal</span>
+                        </a>
+                        <a href="#seguridad"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Seguridad</span>
+                        </a>
+                        <a href="#preferencias"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-cog"></i>
+                            <span>Preferencias</span>
+                        </a>
+                        <a href="#historial"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-history"></i>
+                            <span>Historial</span>
+                        </a>
+                    </nav>
 
-                        <div class="bg-green-50 rounded-lg p-6 border border-green-200">
-                            <h3 class="text-lg font-semibold text-green-800 mb-2">Preferencias</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-green-700">Notificaciones por email</span>
-                                    <div class="relative inline-block w-12 h-6">
-                                        <input type="checkbox" class="sr-only" checked>
-                                        <div class="block bg-green-500 w-12 h-6 rounded-full"></div>
-                                        <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-green-700">Boletín informativo</span>
-                                    <div class="relative inline-block w-12 h-6">
-                                        <input type="checkbox" class="sr-only">
-                                        <div class="block bg-gray-300 w-12 h-6 rounded-full"></div>
-                                        <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
-                                    </div>
-                                </div>
+                    <!-- Estadísticas Rápidas -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h4 class="font-semibold text-gray-800 mb-3">Mi Actividad</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Pedidos realizados:</span>
+                                <span class="font-semibold">12</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Miembro desde:</span>
+                                <span class="font-semibold" th:text="${#temporals.format(usuario.fechaRegistro, 'MM/yyyy')}"></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+
+            <!-- Contenido del Perfil -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Información Personal -->
+                <div id="informacion-personal" class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-user-circle mr-3 text-blue-600"></i>
+                            Información Personal
+                        </h2>
+                        <button onclick="habilitarEdicion('personal')"
+                                class="text-blue-600 hover:text-blue-800 font-semibold transition duration-300">
+                            <i class="fas fa-edit mr-1"></i>Editar
+                        </button>
+                    </div>
+
+                    <form th:action="@{/user/actualizar-perfil}" method="post" id="form-personal">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Nombre -->
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    <i class="fas fa-user mr-2 text-gray-500"></i>Nombre
+                                </label>
+                                <input type="text" th:field="*{usuario.nombre}"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                                       readonly>
+                            </div>
+
+                            <!-- Apellido -->
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    <i class="fas fa-user mr-2 text-gray-500"></i>Apellido
+                                </label>
+                                <input type="text" th:field="*{usuario.apellido}"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                                       readonly>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    <i class="fas fa-envelope mr-2 text-gray-500"></i>Email
+                                </label>
+                                <input type="email" th:field="*{usuario.email}"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                                       readonly>
+                                <p class="text-gray-500 text-sm mt-1">El email no se puede modificar</p>
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    <i class="fas fa-phone mr-2 text-gray-500"></i>Teléfono
+                                </label>
+                                <input type="tel" name="telefono" placeholder="Ingresa tu número de teléfono"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                                       readonly>
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    <i class="fas fa-map-marker-alt mr-2 text-gray-500"></i>Dirección
+                                </label>
+                                <textarea name="direccion" rows="3" placeholder="Ingresa tu dirección completa"
+                                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 resize-none"
+                                          readonly></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="flex justify-end space-x-3 mt-6 hidden" id="botones-personal">
+                            <button type="button" onclick="cancelarEdicion('personal')"
+                                    class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-300 font-semibold">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-semibold">
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Seguridad -->
+                <div id="seguridad" class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-shield-alt mr-3 text-green-600"></i>
+                        Seguridad de la Cuenta
+                    </h2>
+
+                    <div class="space-y-6">
+                        <!-- Cambio de Contraseña -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Cambiar Contraseña</h3>
+                            <form th:action="@{/user/cambiar-password}" method="post" id="form-password">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Contraseña Actual</label>
+                                        <input type="password" name="passwordActual" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Nueva Contraseña</label>
+                                        <input type="password" name="nuevaPassword" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <p class="text-gray-500 text-sm mt-1">Mínimo 6 caracteres</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Confirmar Nueva Contraseña</label>
+                                        <input type="password" name="confirmarPassword" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                                <button type="submit"
+                                        class="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-300 font-semibold">
+                                    <i class="fas fa-key mr-2"></i>Cambiar Contraseña
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Sesiones Activas -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Sesiones Activas</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-desktop text-green-600"></i>
+                                        <div>
+                                            <p class="font-semibold">Chrome - Windows</p>
+                                            <p class="text-gray-600 text-sm">Actual • Lima, PE</p>
+                                        </div>
+                                    </div>
+                                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Activa</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-mobile-alt text-gray-600"></i>
+                                        <div>
+                                            <p class="font-semibold">Safari - iPhone</p>
+                                            <p class="text-gray-600 text-sm">Hace 2 días • Lima, PE</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                                        Cerrar Sesión
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferencias -->
+                <div id="preferencias" class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-cog mr-3 text-purple-600"></i>
+                        Preferencias
+                    </h2>
+
+                    <div class="space-y-6">
+                        <!-- Notificaciones -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Preferencias de Notificación</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Notificaciones por Email</p>
+                                        <p class="text-gray-600 text-sm">Recibe actualizaciones sobre tus pedidos y ofertas</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Notificaciones de Marketing</p>
+                                        <p class="text-gray-600 text-sm">Ofertas especiales y nuevos productos</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preferencias de Comunicación -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Preferencias de Comunicación</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="com-email" checked class="text-blue-600 rounded">
+                                    <label for="com-email" class="text-gray-700">Email</label>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="com-sms" class="text-blue-600 rounded">
+                                    <label for="com-sms" class="text-gray-700">SMS</label>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="com-push" checked class="text-blue-600 rounded">
+                                    <label for="com-push" class="text-gray-700">Notificaciones Push</label>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="com-whatsapp" class="text-blue-600 rounded">
+                                    <label for="com-whatsapp" class="text-gray-700">WhatsApp</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Zona Horaria -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Configuración Regional</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Zona Horaria</label>
+                                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="America/Lima" selected>Lima, Perú (GMT-5)</option>
+                                        <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
+                                        <option value="America/New_York">Nueva York (GMT-5)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Idioma</label>
+                                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="es" selected>Español</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-6">
+                        <button class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-300 font-semibold">
+                            <i class="fas fa-save mr-2"></i>Guardar Preferencias
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Historial -->
+                <div id="historial" class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-history mr-3 text-orange-600"></i>
+                        Historial Reciente
+                    </h2>
+
+                    <div class="space-y-4">
+                        <!-- Actividad Reciente -->
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <p class="font-semibold text-gray-800">Inicio de sesión exitoso</p>
+                            <p class="text-gray-600 text-sm">Chrome • Windows • Lima, PE</p>
+                            <p class="text-gray-500 text-xs">Hace 5 minutos</p>
+                        </div>
+
+                        <div class="border-l-4 border-green-500 pl-4 py-2">
+                            <p class="font-semibold text-gray-800">Pedido completado #12345</p>
+                            <p class="text-gray-600 text-sm">Teclado Mecánico Gaming Pro</p>
+                            <p class="text-gray-500 text-xs">Hace 2 días</p>
+                        </div>
+
+                        <div class="border-l-4 border-purple-500 pl-4 py-2">
+                            <p class="font-semibold text-gray-800">Perfil actualizado</p>
+                            <p class="text-gray-600 text-sm">Información personal modificada</p>
+                            <p class="text-gray-500 text-xs">Hace 1 semana</p>
+                        </div>
+
+                        <div class="border-l-4 border-orange-500 pl-4 py-2">
+                            <p class="font-semibold text-gray-800">Producto agregado a favoritos</p>
+                            <p class="text-gray-600 text-sm">Mouse Gaming XT-500</p>
+                            <p class="text-gray-500 text-xs">Hace 2 semanas</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-6">
+                        <button class="text-blue-600 hover:text-blue-800 font-semibold transition duration-300">
+                            <i class="fas fa-clock mr-2"></i>Ver Historial Completo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<footer th:replace="user/dashboard :: footer"></footer>
+<!-- Scripts adicionales -->
+<script layout:fragment="scripts">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navegación suave entre secciones
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Remover active de todos los enlaces
+                    document.querySelectorAll('nav a').forEach(link => {
+                        link.classList.remove('text-blue-600', 'bg-blue-50', 'font-semibold');
+                        link.classList.add('text-gray-600', 'hover:text-blue-600', 'hover:bg-gray-50');
+                    });
+
+                    // Agregar active al enlace clickeado
+                    this.classList.add('text-blue-600', 'bg-blue-50', 'font-semibold');
+                    this.classList.remove('text-gray-600', 'hover:text-blue-600', 'hover:bg-gray-50');
+
+                    // Scroll suave
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Validación de formulario de contraseña
+        const formPassword = document.getElementById('form-password');
+        if (formPassword) {
+            formPassword.addEventListener('submit', function(e) {
+                const nuevaPassword = this.querySelector('input[name="nuevaPassword"]').value;
+                const confirmarPassword = this.querySelector('input[name="confirmarPassword"]').value;
+
+                if (nuevaPassword.length < 6) {
+                    e.preventDefault();
+                    alert('La nueva contraseña debe tener al menos 6 caracteres.');
+                    return;
+                }
+
+                if (nuevaPassword !== confirmarPassword) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden.');
+                    return;
+                }
+            });
+        }
+    });
+
+    // Funciones de edición
+    function habilitarEdicion(seccion) {
+        const form = document.getElementById(`form-${seccion}`);
+        const botones = document.getElementById(`botones-${seccion}`);
+        const inputs = form.querySelectorAll('input, textarea, select');
+
+        inputs.forEach(input => {
+            if (!input.hasAttribute('readonly') || input.getAttribute('name') !== 'email') {
+                input.removeAttribute('readonly');
+                input.classList.remove('bg-gray-50');
+                input.classList.add('bg-white');
+            }
+        });
+
+        botones.classList.remove('hidden');
+    }
+
+    function cancelarEdicion(seccion) {
+        const form = document.getElementById(`form-${seccion}`);
+        const botones = document.getElementById(`botones-${seccion}`);
+        const inputs = form.querySelectorAll('input, textarea, select');
+
+        inputs.forEach(input => {
+            input.setAttribute('readonly', 'true');
+            input.classList.remove('bg-white');
+            input.classList.add('bg-gray-50');
+        });
+
+        botones.classList.add('hidden');
+        form.reset();
+    }
+
+    // Observador para cambiar el menú activo al hacer scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                const link = document.querySelector(`a[href="#${id}"]`);
+
+                if (link) {
+                    document.querySelectorAll('nav a').forEach(l => {
+                        l.classList.remove('text-blue-600', 'bg-blue-50', 'font-semibold');
+                        l.classList.add('text-gray-600', 'hover:text-blue-600', 'hover:bg-gray-50');
+                    });
+
+                    link.classList.add('text-blue-600', 'bg-blue-50', 'font-semibold');
+                    link.classList.remove('text-gray-600', 'hover:text-blue-600', 'hover:bg-gray-50');
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    // Observar todas las secciones
+    document.querySelectorAll('div[id]').forEach(section => {
+        observer.observe(section);
+    });
+</script>
+
+<style>
+    /* Estilos personalizados para mejor UX */
+    input:read-only {
+        cursor: not-allowed;
+    }
+
+    input:not(:read-only) {
+        cursor: text;
+    }
+
+    /* Animación suave para las transiciones */
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
 </body>
-</html>tml>
+</html>

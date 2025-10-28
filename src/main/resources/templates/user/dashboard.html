@@ -1,224 +1,529 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - PeriTech</title>
+    <title>Mi Dashboard - PeriTech</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-<!-- Header -->
-<header class="bg-white shadow-sm">
-    <div class="container mx-auto px-4 py-3">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <a href="/" class="text-xl font-bold text-blue-600">PeriTech</a>
-                <span class="text-gray-400">|</span>
-                <span class="text-gray-700">Panel de Usuario</span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-700" th:text="'Hola, ' + ${usuario.nombre}"></span>
-                <div class="relative group">
-                    <button class="flex items-center space-x-2 text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-user-circle text-xl"></i>
-                        <i class="fas fa-chevron-down text-xs"></i>
-                    </button>
-                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
-                        <a th:href="@{/user/perfil}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                            <i class="fas fa-user mr-2"></i>Mi Perfil
-                        </a>
-                        <a th:href="@{/user/configuracion}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                            <i class="fas fa-cog mr-2"></i>Configuración
-                        </a>
-                        <div class="border-t my-1"></div>
-                        <form th:action="@{/auth/logout}" method="post" class="block">
-                            <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-                            </button>
-                        </form>
-                    </div>
+<body>
+<div layout:fragment="content">
+    <!-- Header del Dashboard -->
+    <div class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Mi Dashboard</h1>
+                    <p class="text-gray-600 mt-2">Bienvenido de vuelta, <span sec:authentication="name"></span></p>
+                </div>
+                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                    <a th:href="@{/productos/tienda}"
+                       class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold">
+                        <i class="fas fa-shopping-bag mr-2"></i>Ir de Compras
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</header>
 
-<div class="container mx-auto px-4 py-8">
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white rounded-lg shadow-sm p-6 mr-6">
-            <nav class="space-y-2">
-                <a th:href="@{/user/dashboard}"
-                   class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors"
-                   th:class="${paginaActiva == 'dashboard'} ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'">
-                    <i class="fas fa-tachometer-alt w-5"></i>
-                    <span>Dashboard</span>
-                </a>
+    <!-- Mensajes -->
+    <div class="container mx-auto px-4 mt-6">
+        <div th:if="${mensaje}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+    </div>
 
-                <a th:href="@{/user/perfil}"
-                   class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors"
-                   th:class="${paginaActiva == 'perfil'} ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'">
-                    <i class="fas fa-user w-5"></i>
-                    <span>Mi Perfil</span>
-                </a>
-
-                <a th:href="@{/user/pedidos}"
-                   class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors"
-                   th:class="${paginaActiva == 'pedidos'} ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'">
-                    <i class="fas fa-shopping-bag w-5"></i>
-                    <span>Mis Pedidos</span>
-                </a>
-
-                <a th:href="@{/user/configuracion}"
-                   class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors"
-                   th:class="${paginaActiva == 'configuracion'} ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'">
-                    <i class="fas fa-cog w-5"></i>
-                    <span>Configuración</span>
-                </a>
-
-                <a th:href="@{/productos/tienda}"
-                   class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
-                    <i class="fas fa-store w-5"></i>
-                    <span>Ir a la Tienda</span>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1">
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
-
-                <!-- Welcome Card -->
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white mb-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-xl font-bold mb-2">¡Bienvenido de vuelta!</h2>
-                            <p class="opacity-90" th:text="${usuario.nombre} + ' ' + ${usuario.apellido}"></p>
-                            <p class="opacity-90 text-sm mt-1" th:text="${usuario.email}"></p>
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar de Navegación -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+                    <!-- Información de Usuario -->
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-white text-2xl"></i>
                         </div>
-                        <div class="text-4xl">
-                            <i class="fas fa-user-circle"></i>
+                        <h3 class="font-semibold text-gray-800" th:text="${usuario.nombre + ' ' + usuario.apellido}"></h3>
+                        <p class="text-gray-600 text-sm" th:text="${usuario.email}"></p>
+                        <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-2">
+                            <i class="fas fa-star mr-1"></i>Cliente PeriTech
+                        </span>
+                    </div>
+
+                    <!-- Menú de Navegación -->
+                    <nav class="space-y-2">
+                        <a th:href="@{/user/dashboard}"
+                           class="flex items-center space-x-3 p-3 text-blue-600 bg-blue-50 rounded-lg font-semibold border-l-4 border-blue-500">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a th:href="@{/user/perfil}"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-user w-5"></i>
+                            <span>Mi Perfil</span>
+                        </a>
+                        <a th:href="@{/pedidos/historial}"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-shopping-bag w-5"></i>
+                            <span>Mis Pedidos</span>
+                        </a>
+                        <a th:href="@{/carrito}"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-shopping-cart w-5"></i>
+                            <span>Mi Carrito</span>
+                            <span id="sidebar-cart-count" class="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                                  th:text="${totalItems != null ? totalItems : 0}"></span>
+                        </a>
+                        <a th:href="@{/user/favoritos}"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-heart w-5"></i>
+                            <span>Favoritos</span>
+                        </a>
+                        <a th:href="@{/user/configuracion}"
+                           class="flex items-center space-x-3 p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition duration-300">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </nav>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h4 class="font-semibold text-gray-800 mb-3">Acciones Rápidas</h4>
+                        <div class="space-y-2">
+                            <a th:href="@{/productos/tienda}"
+                               class="flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-800 transition duration-300">
+                                <i class="fas fa-plus text-xs"></i>
+                                <span>Realizar nueva compra</span>
+                            </a>
+                            <a th:href="@{/user/perfil}"
+                               class="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800 transition duration-300">
+                                <i class="fas fa-edit text-xs"></i>
+                                <span>Actualizar perfil</span>
+                            </a>
+                            <a th:href="@{/contacto}"
+                               class="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800 transition duration-300">
+                                <i class="fas fa-headset text-xs"></i>
+                                <span>Soporte técnico</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido Principal del Dashboard -->
+            <div class="lg:col-span-3 space-y-8">
+                <!-- Tarjeta de Bienvenida -->
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 text-white">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold mb-2">¡Bienvenido de vuelta!</h2>
+                            <p class="text-blue-100">Estamos encantados de verte de nuevo en PeriTech.</p>
+                            <p class="text-blue-100 text-sm mt-2">
+                                <i class="fas fa-calendar-alt mr-1"></i>
+                                Miembro desde:
+                                <span th:text="${#temporals.format(usuario.fechaRegistro, 'dd/MM/yyyy')}"></span>
+                            </p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                            <div class="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold" th:text="${totalPedidos != null ? totalPedidos : '0'}">0</div>
+                                <div class="text-blue-100 text-sm">Pedidos realizados</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <!-- Estadísticas Rápidas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-600 text-sm">Pedidos Activos</p>
-                                <p class="text-2xl font-bold text-gray-800">3</p>
+                                <p class="text-2xl font-bold text-blue-600" th:text="${pedidosActivos != null ? pedidosActivos : '0'}">0</p>
                             </div>
                             <div class="text-blue-500 text-2xl">
                                 <i class="fas fa-shopping-cart"></i>
                             </div>
                         </div>
+                        <a th:href="@{/pedidos/historial}" class="text-blue-600 hover:text-blue-800 text-sm font-semibold mt-2 inline-block">
+                            Ver detalles <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
                     </div>
 
-                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-600 text-sm">Pedidos Completados</p>
-                                <p class="text-2xl font-bold text-gray-800">12</p>
+                                <p class="text-2xl font-bold text-green-600" th:text="${pedidosCompletados != null ? pedidosCompletados : '0'}">0</p>
                             </div>
                             <div class="text-green-500 text-2xl">
                                 <i class="fas fa-check-circle"></i>
                             </div>
                         </div>
+                        <a th:href="@{/pedidos/historial}" class="text-green-600 hover:text-green-800 text-sm font-semibold mt-2 inline-block">
+                            Ver historial <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
                     </div>
 
-                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-600 text-sm">Miembro desde</p>
-                                <p class="text-lg font-bold text-gray-800">Oct 2024</p>
+                                <p class="text-gray-600 text-sm">Productos en Carrito</p>
+                                <p class="text-2xl font-bold text-orange-600" th:text="${totalItems != null ? totalItems : '0'}">0</p>
                             </div>
-                            <div class="text-purple-500 text-2xl">
-                                <i class="fas fa-calendar-alt"></i>
+                            <div class="text-orange-500 text-2xl">
+                                <i class="fas fa-shopping-bag"></i>
                             </div>
+                        </div>
+                        <a th:href="@{/carrito}" class="text-orange-600 hover:text-orange-800 text-sm font-semibold mt-2 inline-block">
+                            Ver carrito <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Favoritos</p>
+                                <p class="text-2xl font-bold text-red-600">0</p>
+                            </div>
+                            <div class="text-red-500 text-2xl">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <a th:href="@{/user/favoritos}" class="text-red-600 hover:text-red-800 text-sm font-semibold mt-2 inline-block">
+                            Ver favoritos <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Grid de Contenido -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Pedidos Recientes -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-800">Pedidos Recientes</h3>
+                            <a th:href="@{/pedidos/historial}" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                                Ver todos <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+
+                        <div th:if="${pedidosRecientes != null && !pedidosRecientes.empty}" class="space-y-4">
+                            <div th:each="pedido : ${pedidosRecientes}" class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition duration-300">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-semibold text-gray-800" th:text="'Pedido #' + ${pedido.id}"></span>
+                                    <span th:class="${{
+                                        'PENDIENTE': 'bg-yellow-100 text-yellow-800',
+                                        'CONFIRMADO': 'bg-blue-100 text-blue-800',
+                                        'EN_PREPARACION': 'bg-orange-100 text-orange-800',
+                                        'ENVIADO': 'bg-purple-100 text-purple-800',
+                                        'ENTREGADO': 'bg-green-100 text-green-800',
+                                        'CANCELADO': 'bg-red-100 text-red-800'
+                                    }[pedido.estado.name()]}"
+                                          class="px-2 py-1 text-xs rounded-full font-semibold"
+                                          th:text="${pedido.estado}"></span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-600">
+                                    <span th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy')}"></span>
+                                    <span class="font-semibold" th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 2)}"></span>
+                                </div>
+                                <div class="mt-2">
+                                    <a th:href="@{/pedidos/detalle/{id}(id=${pedido.id})}"
+                                       class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                                        Ver detalles <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${pedidosRecientes == null || pedidosRecientes.empty}" class="text-center py-8">
+                            <i class="fas fa-shopping-bag text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-600 mb-4">Aún no tienes pedidos</p>
+                            <a th:href="@{/productos/tienda}"
+                               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 text-sm font-semibold">
+                                Realizar mi primer pedido
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Productos Recomendados -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-800">Productos Recomendados</h3>
+                            <a th:href="@{/productos/tienda}" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                                Ver todos <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Producto 1 -->
+                            <div class="flex items-center space-x-4 p-3 border border-gray-200 rounded-lg hover:border-blue-300 transition duration-300">
+                                <img src="/images/placeholder-product.jpg" alt="Producto" class="w-16 h-16 object-cover rounded-lg">
+                                <div class="flex-grow">
+                                    <h4 class="font-semibold text-gray-800">Teclado Mecánico Gaming</h4>
+                                    <p class="text-gray-600 text-sm">RGB, switches azules</p>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <span class="text-blue-600 font-bold">$89.99</span>
+                                        <button class="text-green-600 hover:text-green-800 transition duration-300">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Producto 2 -->
+                            <div class="flex items-center space-x-4 p-3 border border-gray-200 rounded-lg hover:border-blue-300 transition duration-300">
+                                <img src="/images/placeholder-product.jpg" alt="Producto" class="w-16 h-16 object-cover rounded-lg">
+                                <div class="flex-grow">
+                                    <h4 class="font-semibold text-gray-800">Mouse Gaming Pro</h4>
+                                    <p class="text-gray-600 text-sm">16,000 DPI, 7 botones</p>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <span class="text-blue-600 font-bold">$49.99</span>
+                                        <button class="text-green-600 hover:text-green-800 transition duration-300">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Producto 3 -->
+                            <div class="flex items-center space-x-4 p-3 border border-gray-200 rounded-lg hover:border-blue-300 transition duration-300">
+                                <img src="/images/placeholder-product.jpg" alt="Producto" class="w-16 h-16 object-cover rounded-lg">
+                                <div class="flex-grow">
+                                    <h4 class="font-semibold text-gray-800">Audífonos 7.1</h4>
+                                    <p class="text-gray-600 text-sm">Sonido surround, micrófono</p>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <span class="text-blue-600 font-bold">$129.99</span>
+                                        <button class="text-green-600 hover:text-green-800 transition duration-300">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actividad Reciente -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">Actividad Reciente</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-shopping-cart text-green-600 text-sm"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-gray-800 font-semibold">Pedido completado</p>
+                                    <p class="text-gray-600 text-sm">Pedido #12345 ha sido entregado</p>
+                                    <p class="text-gray-500 text-xs">Hace 2 días</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-edit text-blue-600 text-sm"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-gray-800 font-semibold">Perfil actualizado</p>
+                                    <p class="text-gray-600 text-sm">Has actualizado tu información personal</p>
+                                    <p class="text-gray-500 text-xs">Hace 1 semana</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0 w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-star text-yellow-600 text-sm"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-gray-800 font-semibold">Producto calificado</p>
+                                    <p class="text-gray-600 text-sm">Has calificado el Teclado Mecánico</p>
+                                    <p class="text-gray-500 text-xs">Hace 2 semanas</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-shipping-fast text-purple-600 text-sm"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-gray-800 font-semibold">Pedido en camino</p>
+                                    <p class="text-gray-600 text-sm">Tu pedido #12346 ha sido enviado</p>
+                                    <p class="text-gray-500 text-xs">Hace 3 semanas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ofertas Especiales -->
+                    <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-white">
+                        <div class="text-center">
+                            <h3 class="text-xl font-bold mb-2">¡Oferta Especial!</h3>
+                            <p class="text-orange-100 mb-4">Descuento del 20% en tu próxima compra</p>
+                            <div class="bg-white text-orange-600 text-lg font-bold px-4 py-2 rounded-lg inline-block mb-4">
+                                CODIGO: PERITECH20
+                            </div>
+                            <p class="text-orange-100 text-sm">Válido hasta el 31/12/2024</p>
+                            <a th:href="@{/productos/tienda}"
+                               class="mt-4 bg-white text-orange-600 px-6 py-2 rounded-lg font-semibold hover:bg-orange-50 transition duration-300 inline-block">
+                                Aprovechar Oferta
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white border border-gray-200 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Acciones Rápidas</h3>
-                        <div class="space-y-3">
-                            <a th:href="@{/productos/tienda}"
-                               class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                                <span class="text-gray-700">Realizar nueva compra</span>
-                                <i class="fas fa-arrow-right text-blue-500"></i>
-                            </a>
-
-                            <a th:href="@{/user/pedidos}"
-                               class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-                                <span class="text-gray-700">Ver mis pedidos</span>
-                                <i class="fas fa-arrow-right text-green-500"></i>
-                            </a>
-
-                            <a th:href="@{/user/perfil}"
-                               class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
-                                <span class="text-gray-700">Actualizar perfil</span>
-                                <i class="fas fa-arrow-right text-purple-500"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="bg-white border border-gray-200 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Actividad Reciente</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center space-x-3 text-sm">
-                                <i class="fas fa-shopping-cart text-green-500"></i>
-                                <span>Pedido #1234 completado</span>
-                                <span class="text-gray-500 ml-auto">Hace 2 días</span>
-                            </div>
-                            <div class="flex items-center space-x-3 text-sm">
-                                <i class="fas fa-user-edit text-blue-500"></i>
-                                <span>Perfil actualizado</span>
-                                <span class="text-gray-500 ml-auto">Hace 1 semana</span>
-                            </div>
-                            <div class="flex items-center space-x-3 text-sm">
-                                <i class="fas fa-star text-yellow-500"></i>
-                                <span>Producto calificado</span>
-                                <span class="text-gray-500 ml-auto">Hace 2 semanas</span>
-                            </div>
-                        </div>
+                <!-- Soporte Rápido -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">¿Necesitas ayuda?</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <a th:href="@{/contacto}" class="text-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition duration-300">
+                            <i class="fas fa-headset text-2xl text-blue-600 mb-2"></i>
+                            <p class="font-semibold text-gray-800">Soporte Técnico</p>
+                            <p class="text-gray-600 text-sm">24/7 disponible</p>
+                        </a>
+                        <a th:href="@{/nosotros}" class="text-center p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition duration-300">
+                            <i class="fas fa-info-circle text-2xl text-green-600 mb-2"></i>
+                            <p class="font-semibold text-gray-800">Preguntas Frecuentes</p>
+                            <p class="text-gray-600 text-sm">Encuentra respuestas</p>
+                        </a>
+                        <a th:href="@{/contacto}" class="text-center p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition duration-300">
+                            <i class="fas fa-phone-alt text-2xl text-purple-600 mb-2"></i>
+                            <p class="font-semibold text-gray-800">Contáctanos</p>
+                            <p class="text-gray-600 text-sm">Estamos aquí para ayudarte</p>
+                        </a>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 </div>
 
-<!-- Footer -->
-<footer class="bg-white border-t mt-12">
-    <div class="container mx-auto px-4 py-6">
-        <div class="text-center text-gray-600">
-            <p>&copy; 2024 PeriTech. Todos los derechos reservados.</p>
-        </div>
-    </div>
-</footer>
-
-<script>
-    // JavaScript para el dropdown del perfil
+<!-- Scripts adicionales -->
+<script layout:fragment="scripts">
     document.addEventListener('DOMContentLoaded', function() {
-        const profileButton = document.querySelector('.group button');
-        const dropdown = document.querySelector('.group .hidden');
+        // Actualizar contador del carrito en el sidebar
+        function actualizarContadorSidebar() {
+            const cartCount = document.getElementById('cart-count');
+            const sidebarCount = document.getElementById('sidebar-cart-count');
+            if (cartCount && sidebarCount) {
+                sidebarCount.textContent = cartCount.textContent;
+            }
+        }
 
-        profileButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            dropdown.classList.toggle('hidden');
+        // Actualizar cada 30 segundos
+        setInterval(actualizarContadorSidebar, 30000);
+        actualizarContadorSidebar();
+
+        // Animaciones para las tarjetas
+        const statsCards = document.querySelectorAll('.bg-white.rounded-lg.shadow-md');
+        statsCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
         });
 
-        // Cerrar dropdown al hacer click fuera
-        document.addEventListener('click', function() {
-            dropdown.classList.add('hidden');
+        // Agregar productos al carrito desde el dashboard
+        document.querySelectorAll('.fa-cart-plus').forEach(button => {
+            button.addEventListener('click', function() {
+                const productCard = this.closest('.flex.items-center');
+                const productName = productCard.querySelector('h4').textContent;
+
+                // Simular agregar al carrito (en una implementación real, harías una petición AJAX)
+                mostrarNotificacion(`"${productName}" agregado al carrito`, 'success');
+
+                // Actualizar contadores
+                setTimeout(() => {
+                    const currentCount = parseInt(document.getElementById('cart-count').textContent);
+                    document.getElementById('cart-count').textContent = currentCount + 1;
+                    actualizarContadorSidebar();
+                }, 500);
+            });
         });
+
+        // Contador animado para las estadísticas
+        function animarContadores() {
+            const counters = document.querySelectorAll('.text-2xl.font-bold');
+            counters.forEach(counter => {
+                const target = parseInt(counter.textContent);
+                if (!isNaN(target) && target > 0) {
+                    let current = 0;
+                    const increment = target / 50;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            counter.textContent = target;
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = Math.floor(current);
+                        }
+                    }, 30);
+                }
+            });
+        }
+
+        // Ejecutar animación cuando los elementos son visibles
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animarContadores();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        const statsSection = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
     });
+
+    // Función para mostrar notificaciones
+    function mostrarNotificacion(mensaje, tipo = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 ${
+            tipo === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`;
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                <span>${mensaje}</span>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('opacity-0', 'translate-x-full');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
 </script>
+
+<style>
+    /* Estilos personalizados para el dashboard */
+    .sticky {
+        position: sticky;
+    }
+
+    /* Mejoras visuales para las tarjetas */
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        transition: transform 0.3s ease;
+    }
+
+    /* Animación suave para los enlaces */
+    a {
+        transition: all 0.3s ease;
+    }
+
+    /* Efecto de profundidad para las sombras */
+    .shadow-depth {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+</style>
 </body>
 </html>

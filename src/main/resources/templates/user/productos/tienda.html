@@ -1,10 +1,616 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Tienda - PeriTech</title>
+    <style>
+        .quick-actions {
+            z-index: 10;
+            position: relative;
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .price-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #e5e7eb;
+            outline: none;
+        }
+
+        .price-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .price-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 <body>
+<div layout:fragment="content">
+    <!-- Header Mejorado -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-4">Nuestra Tienda</h1>
+                <p class="text-xl text-blue-100 max-w-2xl mx-auto">
+                    Descubre los mejores periféricos gaming para llevar tu experiencia al siguiente nivel
+                </p>
+            </div>
+        </div>
+    </div>
 
+    <!-- Mensajes Flash -->
+    <div class="container mx-auto px-4 mt-6">
+        <div th:if="${mensaje}"
+             class="animate-fade-in bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 flex items-center">
+            <i class="fas fa-check-circle mr-3 text-green-500"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+        <div th:if="${error}"
+             class="animate-fade-in bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-center">
+            <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Filtros Mejorados -->
+        <div class="mb-8 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <!-- Búsqueda Mejorada -->
+                <div class="flex-1">
+                    <form th:action="@{/productos/tienda}" method="get" class="flex">
+                        <div class="relative flex-1">
+                            <input type="text" name="busqueda" th:value="${busqueda}"
+                                   placeholder="Buscar teclados, mouse, audífonos..."
+                                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-r-lg transition duration-300 font-semibold">
+                            Buscar
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Ordenamiento y Filtros Móvil -->
+                <div class="flex gap-3">
+                    <!-- Ordenamiento -->
+                    <form th:action="@{/productos/tienda}" method="get" class="flex">
+                        <select name="orden" onchange="this.form.submit()"
+                                class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <option value="">Ordenar por</option>
+                            <option value="precio-asc" th:selected="${orden == 'precio-asc'}">Precio: Menor a Mayor
+                            </option>
+                            <option value="precio-desc" th:selected="${orden == 'precio-desc'}">Precio: Mayor a Menor
+                            </option>
+                            <option value="nombre-asc" th:selected="${orden == 'nombre-asc'}">Nombre: A-Z</option>
+                            <option value="nombre-desc" th:selected="${orden == 'nombre-desc'}">Nombre: Z-A</option>
+                        </select>
+                        <input type="hidden" name="categoriaId" th:value="${categoriaId}">
+                        <input type="hidden" name="busqueda" th:value="${busqueda}">
+                        <input type="hidden" name="precioMin" th:value="${precioMin}">
+                        <input type="hidden" name="precioMax" th:value="${precioMax}">
+                    </form>
+
+                    <!-- Botón Limpiar Filtros -->
+                    <div th:if="${categoriaId != null || precioMin != null || precioMax != null || busqueda != null}">
+                        <a th:href="@{/productos/tienda}"
+                           class="inline-flex items-center px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition duration-300">
+                            <i class="fas fa-times mr-2"></i>Limpiar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar Mejorado -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 sticky top-24">
+                    <!-- Categorías Mejoradas -->
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="font-bold text-gray-800 mb-4 text-lg flex items-center">
+                            <i class="fas fa-tags mr-2 text-blue-500"></i>Categorías
+                        </h3>
+                        <div class="space-y-2">
+                            <a th:href="@{/productos/tienda}"
+                               class="flex items-center justify-between p-3 rounded-lg transition duration-300"
+                               th:class="${categoriaId == null} ?
+                                       'bg-blue-50 text-blue-600 font-semibold border border-blue-200' :
+                                       'text-gray-600 hover:bg-gray-50 hover:text-gray-800'">
+                                <span>Todas las categorías</span>
+                                <span class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full"
+                                      th:text="${productos != null ? productos.size() : 0}"></span>
+                            </a>
+                            <div th:each="categoria : ${categorias}">
+                                <a th:href="@{/productos/tienda(categoriaId=${categoria.id})}"
+                                   class="flex items-center justify-between p-3 rounded-lg transition duration-300"
+                                   th:class="${categoriaId == categoria.id} ?
+                                           'bg-blue-50 text-blue-600 font-semibold border border-blue-200' :
+                                           'text-gray-600 hover:bg-gray-50 hover:text-gray-800'">
+                                    <span th:text="${categoria.nombre}"></span>
+                                    <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">0</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro de Precios Mejorado -->
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="font-bold text-gray-800 mb-4 text-lg flex items-center">
+                            <i class="fas fa-filter mr-2 text-green-500"></i>Filtrar por Precio
+                        </h3>
+                        <form th:action="@{/productos/tienda}" method="get" id="price-filter-form">
+                            <!-- Rango de Precios con Slider -->
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Precio mínimo</span>
+                                    <span class="text-sm font-semibold text-blue-600">$<span id="min-price-value"
+                                                                                             th:text="${precioMin != null ? precioMin : '0'}">0</span></span>
+                                </div>
+                                <input type="range" id="min-price" name="precioMin" min="0" max="1000"
+                                       th:value="${precioMin != null ? precioMin : 0}"
+                                       class="price-slider mb-4">
+
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Precio máximo</span>
+                                    <span class="text-sm font-semibold text-blue-600">$<span id="max-price-value"
+                                                                                             th:text="${precioMax != null ? precioMax : '1000'}">1000</span></span>
+                                </div>
+                                <input type="range" id="max-price" name="precioMax" min="0" max="1000"
+                                       th:value="${precioMax != null ? precioMax : 1000}"
+                                       class="price-slider">
+                            </div>
+
+                            <!-- Inputs numéricos -->
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-1">Mínimo</label>
+                                    <input type="number" id="min-price-input" name="precioMin"
+                                           th:value="${precioMin}"
+                                           min="0" max="1000"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-1">Máximo</label>
+                                    <input type="number" id="max-price-input" name="precioMax"
+                                           th:value="${precioMax}"
+                                           min="0" max="1000"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="categoriaId" th:value="${categoriaId}">
+                            <input type="hidden" name="busqueda" th:value="${busqueda}">
+                            <input type="hidden" name="orden" th:value="${orden}">
+
+                            <button type="submit"
+                                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition duration-300 font-semibold">
+                                <i class="fas fa-check mr-2"></i>Aplicar Filtro
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Info de Resultados -->
+                    <div class="p-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                                <i class="fas fa-info-circle mr-2"></i>Resultados
+                            </h4>
+                            <p class="text-blue-700 text-sm">
+                                <span th:text="${productos != null ? productos.size() : 0}">0</span> productos
+                                encontrados
+                            </p>
+                            <div th:if="${busqueda != null}" class="mt-2">
+                                <p class="text-blue-600 text-sm">
+                                    Búsqueda: "<span th:text="${busqueda}"></span>"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banner Promocional -->
+                <div class="mt-6 bg-gradient-to-r from-orange-500 to-pink-600 rounded-2xl shadow-lg p-6 text-white">
+                    <div class="text-center">
+                        <i class="fas fa-shipping-fast text-3xl mb-3"></i>
+                        <h3 class="font-bold text-lg mb-2">¡Envío Gratis!</h3>
+                        <p class="text-sm mb-4">En compras mayores a $50</p>
+                        <div class="bg-white text-orange-600 text-xs font-bold px-3 py-1 rounded-full inline-block">
+                            OFERTA ESPECIAL
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos Mejorados -->
+            <div class="lg:col-span-3">
+                <!-- Header del Grid -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800" th:if="${categoriaId != null}">
+                            <span th:text="${categorias.?[id == categoriaId][0]?.nombre}"></span>
+                            <span class="text-gray-500 text-lg ml-2"
+                                  th:text="'(' + ${productos != null ? productos.size() : 0} + ' productos)'"></span>
+                        </h2>
+                        <h2 class="text-2xl font-bold text-gray-800" th:if="${busqueda != null}">
+                            Resultados para: "<span th:text="${busqueda}"></span>"
+                            <span class="text-gray-500 text-lg ml-2"
+                                  th:text="'(' + ${productos != null ? productos.size() : 0} + ' productos)'"></span>
+                        </h2>
+                        <h2 class="text-2xl font-bold text-gray-800" th:if="${categoriaId == null && busqueda == null}">
+                            Todos los Productos
+                            <span class="text-gray-500 text-lg ml-2"
+                                  th:text="'(' + ${productos != null ? productos.size() : 0} + ' productos)'"></span>
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- Grid de Productos Mejorado -->
+                <div th:if="${productos != null and !productos.empty}">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <div th:each="producto : ${productos}"
+                             class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 animate-fade-in">
+
+                            <!-- Imagen con Efectos Mejorados -->
+                            <div class="relative overflow-hidden rounded-t-2xl">
+                                <div class="aspect-w-16 aspect-h-12 bg-gray-200">
+                                    <img th:src="${producto.imagenUrl ?: '/images/placeholder-product.jpg'}"
+                                         alt="Producto"
+                                         class="w-full h-64 object-cover group-hover:scale-110 transition duration-500">
+                                </div>
+
+                                <!-- Overlay de Hover - PRIMERO (debajo de todo) -->
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-300 rounded-t-2xl"
+                                     style="z-index: 1;"></div>
+
+                                <!-- Badges Mejorados - SEGUNDO -->
+                                <div class="absolute top-3 left-3 flex flex-col gap-2" style="z-index: 10;">
+        <span th:if="${producto.stock < 10 and producto.stock > 0}"
+              class="bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-lg">
+            <i class="fas fa-bolt mr-1"></i>Últimas unidades
+        </span>
+                                    <span th:if="${producto.stock == 0}"
+                                          class="bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-lg">
+            <i class="fas fa-times mr-1"></i>Agotado
+        </span>
+                                </div>
+
+                                <!-- Acciones Rápidas Mejoradas - TERCERO (arriba de todo) -->
+                                <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col gap-2"
+                                     style="z-index: 20;">
+                                    <a th:href="@{/productos/detalle/{id}(id=${producto.id})}"
+                                       class="bg-white text-gray-700 p-3 rounded-full shadow-lg hover:text-blue-600 transition duration-300 transform hover:scale-110 block"
+                                       title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button th:if="${producto.stock > 0}"
+                                            class="quick-cart-btn bg-white text-gray-700 p-3 rounded-full shadow-lg hover:text-green-600 transition duration-300 transform hover:scale-110"
+                                            th:attr="data-product-id=${producto.id}"
+                                            title="Agregar al carrito">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Contenido del Producto Mejorado -->
+                            <div class="p-6">
+                                <!-- Categoría -->
+                                <div class="mb-3">
+                                    <span class="text-blue-600 text-sm font-semibold bg-blue-50 px-2 py-1 rounded-full"
+                                          th:text="${producto.categoria.nombre}"></span>
+                                </div>
+
+                                <!-- Nombre y Descripción -->
+                                <h3 class="font-bold text-gray-800 mb-2 text-lg group-hover:text-blue-600 transition duration-300 line-clamp-2">
+                                    <a th:href="@{/productos/detalle/{id}(id=${producto.id})}"
+                                       th:text="${producto.nombre}"
+                                       class="hover:underline"></a>
+                                </h3>
+
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed"
+                                   th:text="${producto.descripcion}"></p>
+
+                                <!-- Precio y Stock -->
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <span class="text-2xl font-bold text-blue-600"
+                                              th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2)}"></span>
+                                    </div>
+
+                                    <div class="flex items-center space-x-2">
+                                        <span th:if="${producto.stock > 0}"
+                                              class="text-green-600 text-sm font-semibold flex items-center">
+                                            <i class="fas fa-check-circle mr-1"></i>En stock
+                                        </span>
+                                        <span th:if="${producto.stock == 0}"
+                                              class="text-red-600 text-sm font-semibold flex items-center">
+                                            <i class="fas fa-times-circle mr-1"></i>Agotado
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Formulario del Carrito Mejorado -->
+                                <div class="mt-4">
+                                    <form th:action="@{/carrito/agregar}" method="post"
+                                          class="flex items-center space-x-3 bg-gray-50 p-3 rounded-xl">
+                                        <input type="hidden" name="productoId" th:value="${producto.id}">
+                                        <input type="hidden" name="cantidad" value="1">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                                        <div class="flex items-center space-x-2 flex-1">
+                                            <span class="text-sm text-gray-600 font-medium">Cantidad:</span>
+                                            <input type="number" name="cantidad" value="1" min="1"
+                                                   th:attr="max=${producto.stock}"
+                                                   class="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+
+                                        <button type="submit"
+                                                th:disabled="${producto.stock == 0}"
+                                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition duration-300 font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center">
+                                            <i class="fas fa-cart-plus mr-2"></i>
+                                            <span th:text="${producto.stock == 0} ? 'Agotado' : 'Agregar'"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginación Mejorada -->
+                    <div class="mt-12 flex justify-center">
+                        <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
+                            <nav class="flex items-center space-x-2">
+                                <button class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition duration-300 flex items-center">
+                                    <i class="fas fa-chevron-left mr-2"></i>Anterior
+                                </button>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold">1</button>
+                                <button class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition duration-300">
+                                    2
+                                </button>
+                                <button class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition duration-300">
+                                    3
+                                </button>
+                                <button class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition duration-300 flex items-center">
+                                    Siguiente<i class="fas fa-chevron-right ml-2"></i>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado Vacío Mejorado -->
+                <div th:if="${productos == null or productos.empty}" class="text-center py-16">
+                    <div class="max-w-md mx-auto">
+                        <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                            <i class="fas fa-search text-6xl text-gray-300 mb-6"></i>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">No se encontraron productos</h2>
+                            <p class="text-gray-600 mb-6 leading-relaxed" th:if="${busqueda != null}">
+                                No hay resultados para "<span th:text="${busqueda}" class="font-semibold"></span>".
+                                Intenta con otros términos de búsqueda o explora nuestras categorías.
+                            </p>
+                            <p class="text-gray-600 mb-6 leading-relaxed" th:if="${busqueda == null}">
+                                No hay productos disponibles en esta categoría en este momento.
+                                Pronto tendremos nuevos productos disponibles.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                <a th:href="@{/productos/tienda}"
+                                   class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg transition duration-300 font-semibold inline-flex items-center justify-center">
+                                    <i class="fas fa-store mr-2"></i>Ver Todos los Productos
+                                </a>
+                                <a th:href="@{/}"
+                                   class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg transition duration-300 font-semibold inline-flex items-center justify-center">
+                                    <i class="fas fa-home mr-2"></i>Volver al Inicio
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Mejorado -->
+<script layout:fragment="scripts">
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('🛒 Carrito script loaded');
+
+        // Inicializar sliders de precio
+        initPriceSliders();
+
+        // Agregar al carrito rápido
+        document.querySelectorAll('.quick-cart-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                console.log('Quick cart clicked for product:', productId);
+                agregarAlCarritoRapido(productId);
+            });
+        });
+
+
+        // Efectos de hover mejorados
+        initHoverEffects();
+    });
+    document.querySelectorAll('a[th\\:href*="detalle"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            console.log('🔗 Enlace de detalle clickeado:', this.href);
+        });
+    });
+    document.querySelectorAll('a[href*="detalle"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            console.log('🔗 Enlace de detalle clickeado:', this.href);
+            console.log('📍 Elemento:', this);
+            console.log('🎯 Evento:', e);
+        });
+    });
+
+    // Verificar si los enlaces existen
+    console.log('👁️ Enlaces de detalle encontrados:', document.querySelectorAll('a[href*="detalle"]').length);
+
+    function initPriceSliders() {
+        const minPriceSlider = document.getElementById('min-price');
+        const maxPriceSlider = document.getElementById('max-price');
+        const minPriceInput = document.getElementById('min-price-input');
+        const maxPriceInput = document.getElementById('max-price-input');
+        const minPriceValue = document.getElementById('min-price-value');
+        const maxPriceValue = document.getElementById('max-price-value');
+
+        if (minPriceSlider && maxPriceSlider) {
+            // Actualizar valores cuando se mueven los sliders
+            [minPriceSlider, maxPriceSlider].forEach(slider => {
+                slider.addEventListener('input', function () {
+                    const value = this.value;
+                    if (this.id === 'min-price') {
+                        minPriceValue.textContent = value;
+                        if (minPriceInput) minPriceInput.value = value;
+                        // Asegurar que min no sea mayor que max
+                        if (parseInt(value) > parseInt(maxPriceSlider.value)) {
+                            maxPriceSlider.value = value;
+                            maxPriceValue.textContent = value;
+                            if (maxPriceInput) maxPriceInput.value = value;
+                        }
+                    } else {
+                        maxPriceValue.textContent = value;
+                        if (maxPriceInput) maxPriceInput.value = value;
+                        // Asegurar que max no sea menor que min
+                        if (parseInt(value) < parseInt(minPriceSlider.value)) {
+                            minPriceSlider.value = value;
+                            minPriceValue.textContent = value;
+                            if (minPriceInput) minPriceInput.value = value;
+                        }
+                    }
+                });
+            });
+
+            // Actualizar sliders cuando cambian los inputs
+            if (minPriceInput && maxPriceInput) {
+                minPriceInput.addEventListener('change', function () {
+                    const value = Math.min(Math.max(parseInt(this.value) || 0, 0), 1000);
+                    minPriceSlider.value = value;
+                    minPriceValue.textContent = value;
+                });
+
+                maxPriceInput.addEventListener('change', function () {
+                    const value = Math.min(Math.max(parseInt(this.value) || 1000, 0), 1000);
+                    maxPriceSlider.value = value;
+                    maxPriceValue.textContent = value;
+                });
+            }
+        }
+    }
+
+    function initHoverEffects() {
+        // Efectos de tarjetas de producto
+        const productCards = document.querySelectorAll('.group');
+        productCards.forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    }
+
+    function agregarAlCarritoRapido(productoId) {
+        console.log('🛒 Adding to cart via AJAX:', productoId);
+
+        // Crear formulario dinámico con CSRF
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/carrito/agregar';
+
+        // Agregar campos
+        const productoField = document.createElement('input');
+        productoField.type = 'hidden';
+        productoField.name = 'productoId';
+        productoField.value = productoId;
+        form.appendChild(productoField);
+
+        const cantidadField = document.createElement('input');
+        cantidadField.type = 'hidden';
+        cantidadField.name = 'cantidad';
+        cantidadField.value = '1';
+        form.appendChild(cantidadField);
+
+        // Agregar CSRF token
+        const csrfToken = document.querySelector('input[name="_csrf"]');
+        if (csrfToken) {
+            const csrfField = document.createElement('input');
+            csrfField.type = 'hidden';
+            csrfField.name = csrfToken.name;
+            csrfField.value = csrfToken.value;
+            form.appendChild(csrfField);
+        }
+
+        // Enviar formulario
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function mostrarNotificacion(mensaje, tipo) {
+        const notificacion = document.createElement('div');
+        notificacion.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 animate-fade-in ${
+            tipo === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`;
+        notificacion.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-3"></i>
+                <span class="font-semibold">${mensaje}</span>
+            </div>
+        `;
+
+        document.body.appendChild(notificacion);
+
+        setTimeout(() => {
+            notificacion.style.opacity = '0';
+            notificacion.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notificacion.remove();
+            }, 300);
+        }, 3000);
+    }
+</script>
 </body>
 </html>

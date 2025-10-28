@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder; // Inyectado desde PasswordConfig
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -35,37 +35,46 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        // Recursos públicos
+
                         .requestMatchers(
                                 "/",
+                                "/home",
                                 "/css/**",
-                                "/js/**",
+                                "/static/js/**",
                                 "/images/**",
                                 "/webjars/**",
+                                "/favicon.ico"
+                        ).permitAll()
+
+
+                        .requestMatchers(
                                 "/auth/login",
                                 "/auth/registro",
                                 "/auth/registrar",
-                                "/productos/tienda",
-                                "/productos/buscar",
-                                "/productos/filtrar",
-                                "/api/public/**"
+                                "/static/imagenes/productos/tienda",
+                                "/static/imagenes/productos/detalle/**",
+                                "/static/imagenes/productos/buscar",
+                                "/static/imagenes/productos/filtrar",
+                                "/nosotros",
+                                "/contacto",
+                                "/error"
                         ).permitAll()
 
-                        // Rutas de administrador
+
                         .requestMatchers(
                                 "/admin/**",
                                 "/api/admin/**"
                         ).hasRole("ADMIN")
 
-                        // Rutas de usuario
+
                         .requestMatchers(
                                 "/user/**",
                                 "/carrito/**",
                                 "/pedidos/**",
                                 "/api/user/**"
-                        ).hasRole("USER")
+                        ).authenticated()
 
-                        // Cualquier otra solicitud requiere autenticación
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -84,6 +93,16 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .accessDeniedPage("/auth/acceso-denegado")
+                )
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
+                        .expiredUrl("/auth/login?expired=true")
+                )
+                .rememberMe(rememberMe -> rememberMe
+                        .key("uniqueAndSecret")
+                        .tokenValiditySeconds(86400) // 24 horas
+                        .rememberMeParameter("remember-me")
                 );
 
         return http.build();

@@ -1,10 +1,239 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Mi Carrito - PeriTech</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+<div layout:fragment="content">
+    <!-- Header del Carrito -->
+    <div class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Mi Carrito</h1>
+                    <p class="text-gray-600 mt-2">Revisa y gestiona tus productos</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/productos/tienda}"
+                       class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Seguir Comprando
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Mensajes -->
+    <div class="container mx-auto px-4 mt-6">
+        <div th:if="${mensaje}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <div th:if="${items != null && !items.empty}" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Lista de Productos -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6">Productos en el Carrito</h2>
+
+                    <div class="space-y-4">
+                        <div th:each="item : ${items}" class="flex items-center space-x-4 border-b border-gray-200 pb-4">
+                            <!-- Imagen del Producto -->
+                            <div class="flex-shrink-0">
+                                <img th:src="${item.producto.imagenUrl != null} ? ${item.producto.imagenUrl} : '/images/placeholder-product.jpg'"
+                                     alt="Producto"
+                                     class="w-20 h-20 object-cover rounded-lg border border-gray-200">
+                            </div>
+
+                            <!-- Información del Producto -->
+                            <div class="flex-grow">
+                                <h3 class="font-semibold text-gray-800" th:text="${item.producto.nombre}"></h3>
+                                <p class="text-gray-600 text-sm mt-1" th:text="${item.producto.descripcion}"></p>
+                                <p class="text-blue-600 font-semibold mt-1" th:text="'$' + ${#numbers.formatDecimal(item.precioUnitario, 1, 2)}"></p>
+                            </div>
+
+                            <!-- Controles de Cantidad -->
+                            <div class="flex items-center space-x-2">
+                                <form th:action="@{/carrito/actualizar}" method="post" class="flex items-center space-x-2">
+                                    <input type="hidden" name="productoId" th:value="${item.producto.id}">
+                                    <button type="submit" name="cantidad" th:value="${item.cantidad - 1}"
+                                            th:disabled="${item.cantidad <= 1}"
+                                            class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <i class="fas fa-minus text-sm"></i>
+                                    </button>
+
+                                    <span class="w-12 text-center font-semibold" th:text="${item.cantidad}"></span>
+
+                                    <button type="submit" name="cantidad" th:value="${item.cantidad + 1}"
+                                            th:disabled="${item.cantidad >= item.producto.stock}"
+                                            class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <i class="fas fa-plus text-sm"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Subtotal -->
+                            <div class="text-right">
+                                <p class="font-semibold text-gray-800"
+                                   th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></p>
+                                <p class="text-gray-500 text-sm" th:text="'$' + ${#numbers.formatDecimal(item.precioUnitario, 1, 2)} + ' c/u'"></p>
+                            </div>
+
+                            <!-- Eliminar -->
+                            <div>
+                                <form th:action="@{/carrito/eliminar}" method="post">
+                                    <input type="hidden" name="productoId" th:value="${item.producto.id}">
+                                    <button type="submit"
+                                            class="text-red-500 hover:text-red-700 transition duration-300">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Limpiar Carrito -->
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <form th:action="@{/carrito/limpiar}" method="post">
+                            <button type="submit"
+                                    class="text-red-600 hover:text-red-800 transition duration-300 flex items-center">
+                                <i class="fas fa-broom mr-2"></i>
+                                Limpiar Carrito
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen del Pedido -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Resumen del Pedido</h2>
+
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subtotal:</span>
+                            <span class="font-semibold"
+                                  th:text="'$' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Envío:</span>
+                            <span class="font-semibold">$5.00</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold border-t border-gray-200 pt-3">
+                            <span>Total:</span>
+                            <span class="text-blue-600"
+                                  th:text="'$' + ${#numbers.formatDecimal(carrito.total + 5, 1, 2)}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Información de Stock -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-blue-800 font-semibold">Stock Disponible</p>
+                                <p class="text-blue-700 text-sm mt-1">
+                                    Todos los productos en tu carrito tienen stock disponible.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="space-y-3">
+                        <a th:href="@{/pedidos/checkout}"
+                           class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold text-center block">
+                            <i class="fas fa-credit-card mr-2"></i>Proceder al Pago
+                        </a>
+
+                        <a th:href="@{/imagenes/productos/tienda}"
+                           class="w-full bg-gray-200 text-gray-800 py-3 px-4 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center block">
+                            <i class="fas fa-shopping-bag mr-2"></i>Seguir Comprando
+                        </a>
+                    </div>
+
+                    <!-- Información Adicional -->
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-500 text-sm">
+                            <i class="fas fa-shield-alt mr-1"></i>
+                            Compra 100% segura
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carrito Vacío -->
+        <div th:if="${items == null || items.empty}" class="text-center py-12">
+            <div class="max-w-md mx-auto">
+                <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu carrito está vacío</h2>
+                <p class="text-gray-600 mb-8">¡Descubre nuestros increíbles periféricos y comienza a llenar tu carrito!</p>
+                <a th:href="@{/productos/tienda}"
+                   class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold inline-block">
+                    <i class="fas fa-store mr-2"></i>Explorar Tienda
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para actualizar automáticamente el carrito -->
+<script layout:fragment="scripts">
+    // Función para actualizar cantidad con input directo
+    function actualizarCantidad(productoId, nuevaCantidad) {
+        if (nuevaCantidad > 0) {
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = '/carrito/actualizar';
+
+            const productoInput = document.createElement('input');
+            productoInput.type = 'hidden';
+            productoInput.name = 'productoId';
+            productoInput.value = productoId;
+
+            const cantidadInput = document.createElement('input');
+            cantidadInput.type = 'hidden';
+            cantidadInput.name = 'cantidad';
+            cantidadInput.value = nuevaCantidad;
+
+            form.appendChild(productoInput);
+            form.appendChild(cantidadInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Actualizar contador del carrito en el header
+    function actualizarContadorCarrito() {
+        fetch('/carrito/contador')
+            .then(response => response.text())
+            .then(count => {
+                const cartCount = document.getElementById('cart-count');
+                if (cartCount) {
+                    cartCount.textContent = count;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Actualizar cada 10 segundos
+    setInterval(actualizarContadorCarrito, 10000);
+    document.addEventListener('DOMContentLoaded', actualizarContadorCarrito);
+</script>
 </body>
 </html>

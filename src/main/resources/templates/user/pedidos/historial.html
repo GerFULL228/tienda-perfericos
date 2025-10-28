@@ -1,10 +1,267 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Mis Pedidos - PeriTech</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+<div layout:fragment="content">
+    <!-- Header -->
+    <div class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Mis Pedidos</h1>
+                    <p class="text-gray-600 mt-2">Revisa el historial de todos tus pedidos</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/user/dashboard}"
+                       class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Mensajes -->
+    <div class="container mx-auto px-4 mt-6">
+        <div th:if="${mensaje}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold text-gray-800">Filtrar Pedidos</h2>
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-700">Estado:</span>
+                        <select class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todos los estados</option>
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="CONFIRMADO">Confirmado</option>
+                            <option value="EN_PREPARACION">En preparación</option>
+                            <option value="ENVIADO">Enviado</option>
+                            <option value="ENTREGADO">Entregado</option>
+                            <option value="CANCELADO">Cancelado</option>
+                        </select>
+                    </div>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-filter mr-2"></i>Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Pedidos -->
+        <div th:if="${pedidos != null && !pedidos.empty}">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <!-- Header de la tabla -->
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-700">
+                        <div class="col-span-2">N° Pedido</div>
+                        <div class="col-span-2">Fecha</div>
+                        <div class="col-span-2">Total</div>
+                        <div class="col-span-2">Estado</div>
+                        <div class="col-span-4 text-center">Acciones</div>
+                    </div>
+                </div>
+
+                <!-- Pedidos -->
+                <div class="divide-y divide-gray-200">
+                    <div th:each="pedido : ${pedidos}" class="px-6 py-4 hover:bg-gray-50 transition duration-300">
+                        <div class="grid grid-cols-12 gap-4 items-center">
+                            <!-- Número de Pedido -->
+                            <div class="col-span-2">
+                                <span class="font-semibold text-blue-600" th:text="'#' + ${pedido.id}"></span>
+                            </div>
+
+                            <!-- Fecha -->
+                            <div class="col-span-2">
+                                <span class="text-gray-700" th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy')}"></span>
+                                <p class="text-gray-500 text-sm" th:text="${#temporals.format(pedido.fechaPedido, 'HH:mm')}"></p>
+                            </div>
+
+                            <!-- Total -->
+                            <div class="col-span-2">
+                                    <span class="font-semibold text-gray-800"
+                                          th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 2)}"></span>
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="col-span-2">
+                                    <span th:class="${{
+                                        'PENDIENTE': 'bg-yellow-100 text-yellow-800',
+                                        'CONFIRMADO': 'bg-blue-100 text-blue-800',
+                                        'EN_PREPARACION': 'bg-orange-100 text-orange-800',
+                                        'ENVIADO': 'bg-purple-100 text-purple-800',
+                                        'ENTREGADO': 'bg-green-100 text-green-800',
+                                        'CANCELADO': 'bg-red-100 text-red-800'
+                                    }[pedido.estado.name()]}"
+                                          class="px-3 py-1 rounded-full text-xs font-semibold"
+                                          th:text="${pedido.estado}">
+                                    </span>
+                            </div>
+
+                            <!-- Acciones -->
+                            <div class="col-span-4">
+                                <div class="flex justify-center space-x-3">
+                                    <!-- Ver Detalles -->
+                                    <a th:href="@{/pedidos/detalle/{id}(id=${pedido.id})}"
+                                       class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300 text-sm">
+                                        <i class="fas fa-eye mr-1"></i>Ver Detalles
+                                    </a>
+
+                                    <!-- Cancelar (solo si está pendiente o confirmado) -->
+                                    <div th:if="${pedido.estado.name() == 'PENDIENTE' || pedido.estado.name() == 'CONFIRMADO'}">
+                                        <form th:action="@{/pedidos/cancelar/{id}(id=${pedido.id})}" method="post" class="inline">
+                                            <button type="submit"
+                                                    onclick="return confirm('¿Estás seguro de que deseas cancelar este pedido?')"
+                                                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300 text-sm">
+                                                <i class="fas fa-times mr-1"></i>Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Volver a Comprar (solo entregados) -->
+                                    <div th:if="${pedido.estado.name() == 'ENTREGADO'}">
+                                        <a th:href="@{/imagenes/productos/tienda}"
+                                           class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 text-sm">
+                                            <i class="fas fa-redo mr-1"></i>Comprar Again
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información adicional (solo en móvil) -->
+                        <div class="mt-3 pt-3 border-t border-gray-200 md:hidden">
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                    <span class="font-semibold">Dirección:</span>
+                                    <p class="text-gray-600" th:text="${pedido.direccionEntrega}"></p>
+                                </div>
+                                <div>
+                                    <span class="font-semibold">Teléfono:</span>
+                                    <p class="text-gray-600" th:text="${pedido.telefonoContacto}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas rápidas -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="text-2xl font-bold text-blue-600" th:text="${pedidos.size()}"></div>
+                    <p class="text-gray-600 mt-2">Total Pedidos</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="text-2xl font-bold text-green-600"
+                         th:text="${#lists.size(pedidos.?[estado.name() == 'ENTREGADO'])}"></div>
+                    <p class="text-gray-600 mt-2">Entregados</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="text-2xl font-bold text-yellow-600"
+                         th:text="${#lists.size(pedidos.?[estado.name() == 'PENDIENTE'])}"></div>
+                    <p class="text-gray-600 mt-2">Pendientes</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="text-2xl font-bold text-red-600"
+                         th:text="${#lists.size(pedidos.?[estado.name() == 'CANCELADO'])}"></div>
+                    <p class="text-gray-600 mt-2">Cancelados</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sin Pedidos -->
+        <div th:if="${pedidos == null || pedidos.empty}" class="text-center py-12">
+            <div class="max-w-md mx-auto">
+                <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Aún no tienes pedidos</h2>
+                <p class="text-gray-600 mb-6">¡Descubre nuestros productos y realiza tu primer pedido!</p>
+                <div class="space-y-3">
+                    <a th:href="@{/imagenes/productos/tienda}"
+                       class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold inline-block">
+                        <i class="fas fa-store mr-2"></i>Explorar Tienda
+                    </a>
+                    <a th:href="@{/user/dashboard}"
+                       class="bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition duration-300 font-semibold inline-block">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paginación (si la implementas después) -->
+        <div th:if="${pedidos != null && !pedidos.empty}" class="mt-8 flex justify-center">
+            <nav class="flex items-center space-x-2">
+                <button class="px-3 py-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition duration-300">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="px-3 py-2 bg-blue-600 text-white rounded-md">1</button>
+                <button class="px-3 py-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition duration-300">2</button>
+                <button class="px-3 py-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition duration-300">3</button>
+                <button class="px-3 py-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition duration-300">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts adicionales -->
+<script layout:fragment="scripts">
+    // Filtrado de pedidos
+    document.addEventListener('DOMContentLoaded', function() {
+        const estadoSelect = document.querySelector('select');
+        const filterButton = document.querySelector('button.bg-blue-600');
+
+        if (filterButton && estadoSelect) {
+            filterButton.addEventListener('click', function() {
+                const estado = estadoSelect.value;
+                if (estado) {
+                    // Aquí puedes implementar el filtrado por AJAX o redirección
+                    window.location.href = `/pedidos/historial?estado=${estado}`;
+                } else {
+                    window.location.href = '/pedidos/historial';
+                }
+            });
+        }
+
+        // Tooltips para estados
+        const estados = document.querySelectorAll('[th\\:text*="${pedido.estado}"]');
+        estados.forEach(estado => {
+            estado.title = getEstadoDescription(estado.textContent);
+        });
+
+        function getEstadoDescription(estado) {
+            const descriptions = {
+                'PENDIENTE': 'Pedido recibido, pendiente de confirmación',
+                'CONFIRMADO': 'Pedido confirmado, en proceso de preparación',
+                'EN_PREPARACION': 'Pedido en preparación',
+                'ENVIADO': 'Pedido enviado, en camino a tu domicilio',
+                'ENTREGADO': 'Pedido entregado satisfactoriamente',
+                'CANCELADO': 'Pedido cancelado'
+            };
+            return descriptions[estado] || 'Estado del pedido';
+        }
+    });
+</script>
 </body>
 </html>

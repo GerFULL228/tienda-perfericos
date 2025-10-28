@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Acerca de Nosotros - PeriTech</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-5xl font-bold mb-6">Acerca de PeriTech</h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                Líderes en tecnología y periféricos de alta calidad para gamers, profesionales y entusiastas
+            </p>
+            <div class="flex justify-center space-x-4">
+                <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">✓ 5+ Años de Experiencia</span>
+                <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">✓ 10,000+ Clientes Satisfechos</span>
+                <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">✓ Garantía 100%</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nuestra Historia -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-800 mb-6">Nuestra Historia</h2>
+                    <p class="text-gray-600 mb-6 text-lg leading-relaxed">
+                        Fundada en 2019, <span class="text-blue-600 font-semibold">PeriTech</span> nació de la pasión
+                        por la tecnología y la necesidad de ofrecer productos de calidad a precios accesibles.
+                    </p>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Comenzamos como un pequeño emprendimiento en un garaje, con la visión de convertirnos
+                        en la tienda de referencia para gamers, streamers y profesionales que buscan lo mejor
+                        en periféricos y accesorios tecnológicos.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed">
+                        Hoy, gracias a la confianza de nuestros clientes y nuestro compromiso con la calidad,
+                        hemos crecido hasta convertirnos en una de las tiendas online más reconocidas del sector.
+                    </p>
+                </div>
+                <div class="relative">
+                    <img src="/images/about-us.jpg"
+                         alt="Nuestro equipo de trabajo"
+                         class="rounded-2xl shadow-2xl w-full h-96 object-cover">
+                    <div class="absolute -bottom-6 -left-6 bg-blue-600 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="text-3xl font-bold">5+</div>
+                        <div class="text-sm">Años de Experiencia</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nuestra Misión, Visión y Valores -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Lo que nos Define</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                    Nuestros pilares fundamentales que guían cada decisión que tomamos
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Misión -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition duration-300">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-bullseye text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Nuestra Misión</h3>
+                    <p class="text-gray-600">
+                        Proveer tecnología de vanguardia y periféricos de alta calidad que
+                        impulsen la productividad y mejoren la experiencia gaming de nuestros clientes,
+                        ofreciendo siempre el mejor valor y servicio.
+                    </p>
+                </div>
+
+                <!-- Visión -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition duration-300">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-eye text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Nuestra Visión</h3>
+                    <p class="text-gray-600">
+                        Ser la tienda de tecnología preferida en Latinoamérica, reconocida por
+                        nuestra innovación, calidad excepcional y compromiso inquebrantable
+                        con la satisfacción del cliente.
+                    </p>
+                </div>
+
+                <!-- Valores -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition duration-300">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-heart text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Nuestros Valores</h3>
+                    <ul class="text-gray-600 text-left space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Calidad y Durabilidad
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Innovación Constante
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Servicio al Cliente
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Transparencia y Honestidad
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Por Qué Elegirnos -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">¿Por Qué Elegir PeriTech?</h2>
+                <p class="text-gray-600 text-lg">Descubre lo que nos hace diferentes</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-award text-blue-600 text-3xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Calidad Garantizada</h4>
+                    <p class="text-gray-600">Todos nuestros productos pasan rigurosos controles de calidad</p>
+                </div>
+
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shipping-fast text-green-600 text-3xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Envío Rápido</h4>
+                    <p class="text-gray-600">Entrega express en 24-48 horas en la mayoría de pedidos</p>
+                </div>
+
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-purple-600 text-3xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Soporte 24/7</h4>
+                    <p class="text-gray-600">Equipo de soporte disponible siempre que nos necesites</p>
+                </div>
+
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-orange-600 text-3xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Garantía Extendida</h4>
+                    <p class="text-gray-600">Hasta 2 años de garantía en todos nuestros productos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estadísticas -->
+    <section class="py-16 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold mb-2" data-count="10000">10,000+</div>
+                    <div class="text-blue-200">Clientes Satisfechos</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2" data-count="5000">5,000+</div>
+                    <div class="text-blue-200">Productos Vendidos</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2" data-count="50">50+</div>
+                    <div class="text-blue-200">Marcas Aliadas</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2" data-count="98">98%</div>
+                    <div class="text-blue-200">Rating Positivo</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Equipo (Opcional - si quieres mostrar equipo) -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Nuestro Equipo</h2>
+                <p class="text-gray-600 text-lg">Los expertos detrás de PeriTech</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 overflow-hidden">
+                        <img src="/images/team-ceo.jpg" alt="CEO" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800">Carlos Rodríguez</h4>
+                    <p class="text-blue-600 mb-2">CEO & Fundador</p>
+                    <p class="text-gray-600 text-sm">Apasionado por la tecnología y la innovación</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 overflow-hidden">
+                        <img src="/images/directora.jpg" alt="CTO" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800">Ana Martínez</h4>
+                    <p class="text-blue-600 mb-2">Directora de Tecnología</p>
+                    <p class="text-gray-600 text-sm">Especialista en hardware y gaming</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 overflow-hidden">
+                        <img src="/images/director.jpg" alt="Customer Service" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800">Miguel Sánchez</h4>
+                    <p class="text-blue-600 mb-2">Director de Servicio al Cliente</p>
+                    <p class="text-gray-600 text-sm">Comprometido con tu satisfacción</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-16 bg-blue-600 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">¿Listo para Mejorar tu Setup?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">
+                Descubre nuestra amplia selección de periféricos y accesorios tecnológicos
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a th:href="@{/productos/tienda}"
+                   class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+                    Ver Productos
+                </a>
+                <a th:href="@{/contacto}"
+                   class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition duration-300">
+                    Contáctanos
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Scripts adicionales -->
+<script layout:fragment="scripts">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animación de contadores
+        const counters = document.querySelectorAll('[data-count]');
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                const duration = 2000; // 2 segundos
+                const step = target / (duration / 16); // 60fps
+                let current = 0;
+
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    counter.textContent = Math.floor(current) + (counter.textContent.includes('%') ? '%' : '+');
+                }, 16);
+            });
+        };
+
+        // Activar animación cuando la sección sea visible
+        const statsSection = document.querySelector('.bg-gradient-to-r');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+    });
+</script>
+
+<style>
+    /* Animaciones suaves */
+    section {
+        scroll-margin-top: 80px;
+    }
+
+    /* Efectos hover mejorados */
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+    }
+</style>
+</body>
+</html>

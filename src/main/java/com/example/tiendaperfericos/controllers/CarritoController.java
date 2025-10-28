@@ -1,17 +1,16 @@
 package com.example.tiendaperfericos.controllers;
 
-
-
 import com.example.tiendaperfericos.entity.Carrito;
 import com.example.tiendaperfericos.entity.ItemCarrito;
 import com.example.tiendaperfericos.services.implement.AuthServiceImpl;
 import com.example.tiendaperfericos.services.implement.CarritoServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -49,8 +48,8 @@ public class CarritoController {
 
     @PostMapping("/agregar")
     public String agregarAlCarrito(@RequestParam Long productoId,
-                                   @RequestParam(defaultValue = "1") Integer cantidad,
-                                   Model redirectAttributes) {
+                                   @RequestParam Integer cantidad,
+                                   RedirectAttributes redirectAttributes) {
         try {
             Long usuarioId = authService.getUsuarioAutenticadoId();
             if (usuarioId == null) {
@@ -58,27 +57,31 @@ public class CarritoController {
             }
 
             carritoService.agregarProducto(usuarioId, productoId, cantidad);
-            redirectAttributes.addAttribute("mensaje", "Producto agregado al carrito");
+
+            redirectAttributes.addFlashAttribute("mensaje",
+                    cantidad + " producto(s) agregado(s) al carrito exitosamente");
 
         } catch (Exception e) {
             log.error("Error al agregar producto al carrito: {}", e.getMessage());
-            redirectAttributes.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al agregar producto: " + e.getMessage());
         }
 
-        return "redirect:/productos/tienda";
+
+        return "redirect:/productos/detalle/" + productoId;
     }
 
     @PostMapping("/actualizar")
     public String actualizarCantidad(@RequestParam Long productoId,
                                      @RequestParam Integer cantidad,
-                                     Model redirectAttributes) {
+                                     RedirectAttributes redirectAttributes) {
         try {
             Long usuarioId = authService.getUsuarioAutenticadoId();
             carritoService.actualizarCantidad(usuarioId, productoId, cantidad);
-            redirectAttributes.addAttribute("mensaje", "Carrito actualizado");
+            redirectAttributes.addFlashAttribute("mensaje", "Carrito actualizado");
         } catch (Exception e) {
             log.error("Error al actualizar carrito: {}", e.getMessage());
-            redirectAttributes.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
         return "redirect:/carrito";
@@ -86,28 +89,28 @@ public class CarritoController {
 
     @PostMapping("/eliminar")
     public String eliminarDelCarrito(@RequestParam Long productoId,
-                                     Model redirectAttributes) {
+                                     RedirectAttributes redirectAttributes) {
         try {
             Long usuarioId = authService.getUsuarioAutenticadoId();
             carritoService.eliminarProducto(usuarioId, productoId);
-            redirectAttributes.addAttribute("mensaje", "Producto eliminado del carrito");
+            redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado del carrito"); 
         } catch (Exception e) {
             log.error("Error al eliminar producto del carrito: {}", e.getMessage());
-            redirectAttributes.addAttribute("error", "Error al eliminar producto");
+            redirectAttributes.addFlashAttribute("error", "Error al eliminar producto"); 
         }
 
         return "redirect:/carrito";
     }
 
     @PostMapping("/limpiar")
-    public String limpiarCarrito(Model redirectAttributes) {
+    public String limpiarCarrito(RedirectAttributes redirectAttributes) {
         try {
             Long usuarioId = authService.getUsuarioAutenticadoId();
             carritoService.limpiarCarrito(usuarioId);
-            redirectAttributes.addAttribute("mensaje", "Carrito limpiado");
+            redirectAttributes.addFlashAttribute("mensaje", "Carrito limpiado");
         } catch (Exception e) {
             log.error("Error al limpiar carrito: {}", e.getMessage());
-            redirectAttributes.addAttribute("error", "Error al limpiar carrito");
+            redirectAttributes.addFlashAttribute("error", "Error al limpiar carrito");
         }
 
         return "redirect:/carrito";

@@ -1,10 +1,392 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Checkout - PeriTech</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+<div layout:fragment="content">
+    <!-- Header -->
+    <div class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Finalizar Compra</h1>
+                    <p class="text-gray-600 mt-2">Completa tu información para procesar el pedido</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/carrito}"
+                       class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver al Carrito
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Mensajes -->
+    <div class="container mx-auto px-4 mt-6">
+        <div th:if="${mensaje}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Formulario de Checkout -->
+            <div class="lg:col-span-2">
+                <form th:action="@{/pedidos/crear}" method="post" id="checkout-form">
+                    <!-- Información de Envío -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-truck mr-2"></i>Información de Envío
+                        </h2>
+
+                        <div class="space-y-4">
+                            <!-- Dirección -->
+                            <div>
+                                <label for="direccionEntrega" class="block text-gray-700 font-semibold mb-2">
+                                    Dirección de Entrega *
+                                </label>
+                                <textarea id="direccionEntrega" name="direccionEntrega" required
+                                          rows="3"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Ingresa tu dirección completa (calle, número, ciudad, código postal)"
+                                          th:value="${usuario != null ? (usuario.direccion != null ? usuario.direccion : '') : ''}"></textarea>
+                                <p class="text-gray-500 text-sm mt-1">Asegúrate de que la dirección sea correcta para la entrega.</p>
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div>
+                                <label for="telefonoContacto" class="block text-gray-700 font-semibold mb-2">
+                                    Teléfono de Contacto *
+                                </label>
+                                <input type="tel" id="telefonoContacto" name="telefonoContacto" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ej: +1 234 567 890"
+                                       th:value="${usuario != null ? (usuario.telefono != null ? usuario.telefono : '') : ''}">
+                                <p class="text-gray-500 text-sm mt-1">Usaremos este número para contactarte sobre tu pedido.</p>
+                            </div>
+
+                            <!-- Instrucciones Especiales -->
+                            <div>
+                                <label for="instrucciones" class="block text-gray-700 font-semibold mb-2">
+                                    Instrucciones Especiales (Opcional)
+                                </label>
+                                <textarea id="instrucciones" name="instrucciones"
+                                          rows="2"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Ej: Timbre 3, dejar con vecino, etc."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Método de Envío -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-shipping-fast mr-2"></i>Método de Envío
+                        </h2>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-4 border border-gray-300 rounded-lg hover:border-blue-500 cursor-pointer">
+                                <div class="flex items-center space-x-4">
+                                    <input type="radio" name="metodoEnvio" value="ESTANDAR" checked class="text-blue-600">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Envío Estándar</p>
+                                        <p class="text-gray-600 text-sm">Entrega en 3-5 días hábiles</p>
+                                    </div>
+                                </div>
+                                <span class="font-semibold text-gray-800">$5.00</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 border border-gray-300 rounded-lg hover:border-blue-500 cursor-pointer">
+                                <div class="flex items-center space-x-4">
+                                    <input type="radio" name="metodoEnvio" value="EXPRESS" class="text-blue-600">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Envío Express</p>
+                                        <p class="text-gray-600 text-sm">Entrega en 24-48 horas</p>
+                                    </div>
+                                </div>
+                                <span class="font-semibold text-gray-800">$12.00</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 border border-gray-300 rounded-lg hover:border-blue-500 cursor-pointer">
+                                <div class="flex items-center space-x-4">
+                                    <input type="radio" name="metodoEnvio" value="GRATIS" class="text-blue-600">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Envío Gratuito</p>
+                                        <p class="text-gray-600 text-sm">Para compras mayores a $50.00</p>
+                                    </div>
+                                </div>
+                                <span class="font-semibold text-green-600">Gratis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Método de Pago -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-credit-card mr-2"></i>Método de Pago
+                        </h2>
+
+                        <div class="space-y-4">
+                            <!-- Tarjeta de Crédito -->
+                            <div class="border border-gray-300 rounded-lg p-4">
+                                <div class="flex items-center space-x-3 mb-4">
+                                    <input type="radio" name="metodoPago" value="TARJETA" checked class="text-blue-600">
+                                    <i class="fas fa-credit-card text-2xl text-gray-600"></i>
+                                    <span class="font-semibold text-gray-800">Tarjeta de Crédito/Débito</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-semibold mb-2">Número de Tarjeta</label>
+                                        <input type="text" placeholder="1234 5678 9012 3456"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-semibold mb-2">Nombre en la Tarjeta</label>
+                                        <input type="text" placeholder="JUAN PEREZ"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-semibold mb-2">Fecha de Expiración</label>
+                                        <input type="text" placeholder="MM/AA"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-semibold mb-2">CVV</label>
+                                        <input type="text" placeholder="123"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PayPal -->
+                            <div class="border border-gray-300 rounded-lg p-4">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="metodoPago" value="PAYPAL" class="text-blue-600">
+                                    <i class="fab fa-paypal text-2xl text-blue-600"></i>
+                                    <span class="font-semibold text-gray-800">PayPal</span>
+                                </div>
+                            </div>
+
+                            <!-- Transferencia Bancaria -->
+                            <div class="border border-gray-300 rounded-lg p-4">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="metodoPago" value="TRANSFERENCIA" class="text-blue-600">
+                                    <i class="fas fa-university text-2xl text-gray-600"></i>
+                                    <span class="font-semibold text-gray-800">Transferencia Bancaria</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Términos y Condiciones -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-start space-x-3">
+                            <input type="checkbox" id="terminos" required class="mt-1 text-blue-600">
+                            <label for="terminos" class="text-gray-700">
+                                He leído y acepto los
+                                <a href="#" class="text-blue-600 hover:text-blue-800">términos y condiciones</a>
+                                y la
+                                <a href="#" class="text-blue-600 hover:text-blue-800">política de privacidad</a>
+                                de PeriTech.
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Resumen del Pedido -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Resumen del Pedido</h2>
+
+                    <!-- Productos REALES del carrito -->
+                    <div class="space-y-3 mb-4 max-h-60 overflow-y-auto" th:if="${itemsCarrito != null and !itemsCarrito.empty}">
+                        <div th:each="item : ${itemsCarrito}" class="flex items-center space-x-3 text-sm">
+                            <img th:src="${item.producto.imagenUrl ?: '/images/placeholder-product.jpg'}"
+                                 alt="Producto" class="w-12 h-12 object-cover rounded-md">
+                            <div class="flex-grow">
+                                <p class="font-semibold" th:text="${item.producto.nombre}"></p>
+                                <p class="text-gray-600" th:text="'Cantidad: ' + ${item.cantidad}"></p>
+                                <p class="text-gray-600 text-xs" th:text="'$' + ${#numbers.formatDecimal(item.producto.precio, 1, 2)} + ' c/u'"></p>
+                            </div>
+                            <span class="font-semibold"
+                                  th:text="'$' + ${#numbers.formatDecimal(item.producto.precio * item.cantidad, 1, 2)}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje si el carrito está vacío -->
+                    <div th:if="${itemsCarrito == null or itemsCarrito.empty}" class="text-center py-4">
+                        <i class="fas fa-shopping-cart text-3xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-500 text-sm">Tu carrito está vacío</p>
+                    </div>
+
+                    <!-- Totales REALES -->
+                    <div class="space-y-2 mb-6 border-t border-gray-200 pt-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Subtotal:</span>
+                            <span class="font-semibold" th:text="'$' + ${#numbers.formatDecimal(subtotal, 1, 2)}"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Envío:</span>
+                            <span class="font-semibold" id="envio-costo">
+                    <span th:if="${costoEnvio == 0}" class="text-green-600">Gratis</span>
+                    <span th:if="${costoEnvio > 0}" th:text="'$' + ${#numbers.formatDecimal(costoEnvio, 1, 2)}"></span>
+                </span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold border-t border-gray-200 pt-3">
+                            <span>Total:</span>
+                            <span class="text-blue-600" id="total-final" th:text="'$' + ${#numbers.formatDecimal(total, 1, 2)}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Información de Seguridad -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <p class="font-semibold text-green-800">Compra 100% Segura</p>
+                                <p class="text-green-700 text-sm">Tu información está protegida con encriptación SSL</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Confirmación -->
+                    <button type="submit" form="checkout-form"
+                            class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold text-lg shadow-lg"
+                            th:disabled="${itemsCarrito == null or itemsCarrito.empty}">
+                        <i class="fas fa-lock mr-2"></i>
+                        <span th:if="${itemsCarrito != null and !itemsCarrito.empty}">Confirmar y Pagar</span>
+                        <span th:if="${itemsCarrito == null or itemsCarrito.empty}">Carrito Vacío</span>
+                    </button>
+
+                    <!-- Garantías -->
+                    <div class="mt-6 space-y-3 text-center">
+                        <div class="flex items-center justify-center text-sm text-gray-600">
+                            <i class="fas fa-undo mr-2"></i>
+                            <span>30 días de devolución</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-600">
+                            <i class="fas fa-headset mr-2"></i>
+                            <span>Soporte 24/7</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-600">
+                            <i class="fas fa-award mr-2"></i>
+                            <span>Garantía del producto</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts adicionales -->
+<script layout:fragment="scripts">
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🛒 Checkout cargado - Productos:', <span th:text="${itemsCarrito != null ? itemsCarrito.size() : 0}">0</span>);
+
+        // Actualizar costos de envío dinámicamente
+        const envioRadios = document.querySelectorAll('input[name="metodoEnvio"]');
+        const envioCosto = document.getElementById('envio-costo');
+        const totalFinal = document.getElementById('total-final');
+
+        function actualizarCostos() {
+            const selectedEnvio = document.querySelector('input[name="metodoEnvio"]:checked').value;
+            let costoEnvio = 5.00;
+
+            switch(selectedEnvio) {
+                case 'EXPRESS':
+                    costoEnvio = 12.00;
+                    break;
+                case 'GRATIS':
+                    costoEnvio = 0.00;
+                    break;
+            }
+
+            // Usar subtotal REAL del backend
+            const subtotal = parseFloat('<span th:text="${subtotal}">0</span>');
+            const total = subtotal + costoEnvio;
+
+            envioCosto.innerHTML = costoEnvio === 0 ?
+                '<span class="text-green-600">Gratis</span>' :
+                `$${costoEnvio.toFixed(2)}`;
+            totalFinal.textContent = `$${total.toFixed(2)}`;
+        }
+
+        envioRadios.forEach(radio => {
+            radio.addEventListener('change', actualizarCostos);
+        });
+
+        // Auto-selección de envío gratuito si el total es mayor a $50
+        const subtotal = parseFloat('<span th:text="${subtotal}">0</span>');
+        if (subtotal >= 50) {
+            const envioGratis = document.querySelector('input[value="GRATIS"]');
+            if (envioGratis) {
+                envioGratis.checked = true;
+                actualizarCostos();
+            }
+        }
+
+        // Validación del formulario
+        const form = document.getElementById('checkout-form');
+        form.addEventListener('submit', function(e) {
+            const direccion = document.getElementById('direccionEntrega').value.trim();
+            const telefono = document.getElementById('telefonoContacto').value.trim();
+            const terminos = document.getElementById('terminos').checked;
+            const itemsCarrito = <span th:text="${itemsCarrito != null ? itemsCarrito.size() : 0}">0</span>;
+
+            if (itemsCarrito === 0) {
+                e.preventDefault();
+                alert('❌ Tu carrito está vacío. Agrega productos antes de continuar.');
+                return;
+            }
+
+            if (!direccion) {
+                e.preventDefault();
+                alert('❌ Por favor, ingresa tu dirección de entrega.');
+                return;
+            }
+
+            if (!telefono) {
+                e.preventDefault();
+                alert('❌ Por favor, ingresa tu número de teléfono.');
+                return;
+            }
+
+            if (!terminos) {
+                e.preventDefault();
+                alert('❌ Debes aceptar los términos y condiciones para continuar.');
+                return;
+            }
+
+            // Mostrar loading
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
+            submitBtn.disabled = true;
+
+            // Permitir que el formulario se envíe normalmente
+            console.log('✅ Formulario validado, enviando...');
+        });
+
+        // Inicializar costos
+        actualizarCostos();
+    });
+</script>
 </body>
 </html>

@@ -1,46 +1,529 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda de Periféricos</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Inicio - PeriTech</title>
 </head>
-<body class="bg-gray-100">
-<!-- Navbar -->
-<div th:replace="fragments/navbar :: navbar"></div>
+<body>
 
-<!-- Hero Section -->
-<div class="bg-blue-600 text-white py-20">
-    <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl font-bold mb-4">Bienvenido a nuestra Tienda de Periféricos</h1>
-        <p class="text-xl mb-8">Los mejores teclados, mouse y accesorios gaming</p>
-        <a href="/productos/tienda" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
-            Ver Productos
-        </a>
-    </div>
-</div>
+<div layout:fragment="content">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+        <div class="container mx-auto px-4 py-20">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Texto Hero -->
+                <div class="text-center lg:text-left">
+                    <h1 class="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                        Eleva tu
+                        <span class="text-yellow-300">Setup Gaming</span>
+                    </h1>
+                    <p class="text-xl mb-8 text-blue-100 leading-relaxed">
+                        Descubre los mejores periféricos gaming, teclados mecánicos,
+                        mouse de precisión y audífonos de última generación para
+                        dominar cada partida.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a th:href="@{/productos/tienda}"
+                           class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-shopping-bag mr-2"></i>Explorar Tienda
+                        </a>
+                        <a th:href="@{/nosotros}"
+                           class="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-600 transition duration-300">
+                            <i class="fas fa-info-circle mr-2"></i>Conoce Más
+                        </a>
+                    </div>
 
-<!-- Productos Destacados -->
-<div class="container mx-auto px-4 py-12">
-    <h2 class="text-3xl font-bold text-center mb-8">Productos Destacados</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div th:each="producto : ${productosDestacados}" class="bg-white rounded-lg shadow-md p-6">
-            <img th:src="${producto.imagenUrl}" th:alt="${producto.nombre}" class="w-full h-48 object-cover mb-4 rounded">
-            <h3 class="text-xl font-semibold mb-2" th:text="${producto.nombre}"></h3>
-            <p class="text-gray-600 mb-4" th:text="${producto.descripcion}"></p>
-            <div class="flex justify-between items-center">
-                <span class="text-2xl font-bold text-green-600" th:text="'$' + ${producto.precio}"></span>
-                <a th:href="@{/productos/detalle/} + ${producto.id}"
-                   class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
-                    Ver Detalle
+                    <!-- Estadísticas -->
+                    <div class="mt-12 grid grid-cols-3 gap-8 text-center lg:text-left">
+                        <div>
+                            <div class="text-3xl font-bold">
+                                <span th:text="${totalProductos != null ? totalProductos : '500'}">500</span>+
+                            </div>
+                            <div class="text-blue-200">Productos</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">10K+</div>
+                            <div class="text-blue-200">Clientes</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">99%</div>
+                            <div class="text-blue-200">Satisfacción</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imagen Hero -->
+                <div class="relative">
+                    <div class="relative z-10">
+                        <img src="/images/hero-gaming-setup.png"
+                             alt="Setup Gaming PeriTech"
+                             class="w-full rounded-2xl shadow-2xl transform hover:scale-105 transition duration-500">
+                    </div>
+                    <!-- Elementos decorativos -->
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-yellow-400 rounded-full opacity-20 animate-pulse"></div>
+                    <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-pink-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Sección Categorías -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Explora por Categoría</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Encuentra el periférico perfecto para cada necesidad en tu setup gaming
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Teclados -->
+                <div class="group bg-gray-50 rounded-2xl p-8 text-center hover:bg-blue-50 transition duration-300 transform hover:-translate-y-2 cursor-pointer">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-200 transition duration-300">
+                        <i class="fas fa-keyboard text-3xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Teclados</h3>
+                    <p class="text-gray-600 mb-4">Mecánicos, membrane y gaming</p>
+                    <a th:href="@{/productos/tienda}" class="text-blue-600 font-semibold hover:text-blue-800 transition duration-300">
+                        Ver productos <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <!-- Mouse -->
+                <div class="group bg-gray-50 rounded-2xl p-8 text-center hover:bg-green-50 transition duration-300 transform hover:-translate-y-2 cursor-pointer">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-200 transition duration-300">
+                        <i class="fas fa-mouse text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Mouse</h3>
+                    <p class="text-gray-600 mb-4">Alta precisión y ergonomía</p>
+                    <a th:href="@{/productos/tienda}" class="text-green-600 font-semibold hover:text-green-800 transition duration-300">
+                        Ver productos <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <!-- Audífonos -->
+                <div class="group bg-gray-50 rounded-2xl p-8 text-center hover:bg-purple-50 transition duration-300 transform hover:-translate-y-2 cursor-pointer">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-200 transition duration-300">
+                        <i class="fas fa-headphones text-3xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Audífonos</h3>
+                    <p class="text-gray-600 mb-4">Sonido envolvente 7.1</p>
+                    <a th:href="@{/productos/tienda}" class="text-purple-600 font-semibold hover:text-purple-800 transition duration-300">
+                        Ver productos <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <!-- Accesorios -->
+                <div class="group bg-gray-50 rounded-2xl p-8 text-center hover:bg-orange-50 transition duration-300 transform hover:-translate-y-2 cursor-pointer">
+                    <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-orange-200 transition duration-300">
+                        <i class="fas fa-gamepad text-3xl text-orange-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Accesorios</h3>
+                    <p class="text-gray-600 mb-4">Pads, soportes y más</p>
+                    <a th:href="@{/productos/tienda}" class="text-orange-600 font-semibold hover:text-orange-800 transition duration-300">
+                        Ver productos <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Productos Destacados -->
+    <!-- Productos Destacados -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Productos Destacados</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Los favoritos de nuestra comunidad gaming
+                </p>
+            </div>
+
+            <div th:if="${productosDestacados != null and !productosDestacados.empty}">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div th:each="producto : ${productosDestacados}"
+                         class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 overflow-hidden group">
+                        <!-- Imagen del Producto -->
+                        <div class="relative overflow-hidden">
+                            <img th:src="${producto.imagenUrl != null} ? ${producto.imagenUrl} : '/images/placeholder-product.jpg'"
+                                 alt="Producto"
+                                 class="w-full h-48 object-cover group-hover:scale-110 transition duration-500">
+
+                            <!-- Badge Destacado -->
+                            <div class="absolute top-3 left-3">
+                                    <span class="bg-red-500 text-white text-xs px-3 py-1 rounded-full font-bold">
+                                        <i class="fas fa-star mr-1"></i>Destacado
+                                    </span>
+                            </div>
+
+                            <!-- Acciones Rápidas -->
+                            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition duration-300 space-y-2">
+                                <a th:href="@{/productos/detalle/{id}(id=${producto.id})}"
+                                   class="bg-white text-gray-700 p-2 rounded-full shadow-md hover:text-blue-600 transition duration-300 block">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button th:if="${producto.stock > 0}"
+                                        th:onclick="'agregarAlCarritoRapido(' + ${producto.id} + ')'"
+                                        class="bg-white text-gray-700 p-2 rounded-full shadow-md hover:text-green-600 transition duration-300 block">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Información del Producto -->
+                        <div class="p-6">
+                            <div class="mb-2">
+                                <span class="text-gray-500 text-sm" th:text="${producto.categoria?.nombre}">Categoría</span>
+                            </div>
+
+                            <h3 class="font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition duration-300 line-clamp-2">
+                                <a th:href="@{/productos/detalle/{id}(id=${producto.id})}" th:text="${producto.nombre}">Nombre del Producto</a>
+                            </h3>
+
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-2" th:text="${producto.descripcion}">Descripción del producto</p>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-blue-600 font-bold text-lg"
+                                      th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2)}">$0.00</span>
+
+                                <div class="flex items-center space-x-1 text-yellow-400 text-sm">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+
+                            <!-- Stock y Botón -->
+                            <div class="mt-4 flex items-center justify-between">
+                                <span th:if="${producto.stock > 0}" class="text-green-600 text-sm">
+                                    <i class="fas fa-check-circle mr-1"></i>En stock
+                                </span>
+                                <span th:if="${producto.stock <= 0}" class="text-red-600 text-sm">
+                                    <i class="fas fa-times-circle mr-1"></i>Agotado
+                                </span>
+
+                                <a th:href="@{/productos/detalle/{id}(id=${producto.id})}"
+                                   class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition duration-300">
+                                    Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Ver Más -->
+                <div class="text-center mt-12">
+                    <a th:href="@{/productos/tienda}"
+                       class="bg-gray-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-gray-900 transition duration-300 inline-flex items-center">
+                        Ver Todos los Productos
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Estado vacío -->
+            <div th:if="${productosDestacados == null or productosDestacados.empty}" class="text-center py-12">
+                <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Próximamente</h3>
+                <p class="text-gray-600 mb-6">Estamos preparando los mejores productos para ti</p>
+                <a th:href="@{/productos/tienda}"
+                   class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Explorar Tienda
                 </a>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Por qué elegirnos -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Imagen -->
+                <div class="relative">
+                    <img src="/images/why-choose-us.jpg"
+                         alt="Por qué elegir PeriTech"
+                         class="rounded-2xl shadow-2xl">
+                    <div class="absolute -bottom-6 -right-6 bg-blue-600 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="text-3xl font-bold">99%</div>
+                        <div class="text-sm">Clientes Satisfechos</div>
+                    </div>
+                </div>
+
+                <!-- Contenido -->
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-800 mb-6">¿Por qué elegir PeriTech?</h2>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-shipping-fast text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">Envío Express</h3>
+                                <p class="text-gray-600">Recibe tus productos en 24-48 horas con nuestro servicio de envío prioritario.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">Garantía Extendida</h3>
+                                <p class="text-gray-600">Todos nuestros productos incluyen 2 años de garantía del fabricante.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-headset text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">Soporte 24/7</h3>
+                                <p class="text-gray-600">Nuestro equipo de soporte está disponible para ayudarte en cualquier momento.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-undo text-orange-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">Devolución Fácil</h3>
+                                <p class="text-gray-600">30 días para devoluciones sin complicaciones si no estás satisfecho.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonios -->
+    <section class="py-16 bg-gray-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Lo que dicen nuestros gamers</h2>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                    Descubre por miles de jugadores confían en PeriTech para su setup gaming
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonio 1 -->
+                <div class="bg-gray-800 rounded-2xl p-6 hover:bg-gray-700 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                            AJ
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Alex Johnson</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">
+                        "El teclado mecánico que compré transformó mi experiencia gaming.
+                        La respuesta táctil es increíble y el RGB espectacular."
+                    </p>
+                </div>
+
+                <!-- Testimonio 2 -->
+                <div class="bg-gray-800 rounded-2xl p-6 hover:bg-gray-700 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                            MS
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Maria Sánchez</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">
+                        "Excelente servicio al cliente. Me ayudaron a elegir el mouse perfecto
+                        para FPS y llegó en menos de 24 horas."
+                    </p>
+                </div>
+
+                <!-- Testimonio 3 -->
+                <div class="bg-gray-800 rounded-2xl p-6 hover:bg-gray-700 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                            CP
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Carlos Pérez</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">
+                        "La calidad de los audífonos superó mis expectativas.
+                        El sonido surround es perfecto para detectar enemigos."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-6">¿Listo para mejorar tu setup?</h2>
+            <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+                Únete a miles de gamers que ya confían en PeriTech para llevar su experiencia
+                gaming al siguiente nivel.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a th:href="@{/productos/tienda}"
+                   class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-rocket mr-2"></i>Comenzar Ahora
+                </a>
+                <a th:href="@{/contacto}"
+                   class="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-600 transition duration-300">
+                    <i class="fas fa-question-circle mr-2"></i>¿Necesitas Ayuda?
+                </a>
+            </div>
+        </div>
+    </section>
 </div>
 
-<!-- Footer -->
-<div th:replace="fragments/footer :: footer"></div>
+<!-- Scripts adicionales -->
+<div layout:fragment="scripts">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de inicio cargada correctamente');
+
+            // Animación de contadores
+            function animateCounter(element, target, duration) {
+                let start = 0;
+                const increment = target / (duration / 16);
+                const timer = setInterval(() => {
+                    start += increment;
+                    if (start >= target) {
+                        element.textContent = target + '+';
+                        clearInterval(timer);
+                    } else {
+                        element.textContent = Math.floor(start) + '+';
+                    }
+                }, 16);
+            }
+
+            // Observar cuando los contadores son visibles
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counterElements = entry.target.querySelectorAll('.text-3xl.font-bold');
+                        counterElements.forEach(element => {
+                            const target = parseInt(element.textContent);
+                            if (!isNaN(target)) {
+                                animateCounter(element, target, 2000);
+                            }
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+
+            const statsSection = document.querySelector('.grid.grid-cols-3');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+
+            // Agregar al carrito rápido
+            window.agregarAlCarritoRapido = function(productoId) {
+                console.log('Agregando producto al carrito:', productoId);
+
+                fetch('/carrito/agregar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `productoId=${productoId}&cantidad=1`
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            mostrarNotificacion('Producto agregado al carrito', 'success');
+                            actualizarContadorCarrito();
+                        } else {
+                            mostrarNotificacion('Error al agregar producto', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        mostrarNotificacion('Error al agregar producto', 'error');
+                    });
+            };
+
+            function mostrarNotificacion(mensaje, tipo) {
+                // Usar la función del layout o crear una propia
+                if (typeof mostrarNotificacion === 'function') {
+                    mostrarNotificacion(mensaje, tipo);
+                } else {
+                    // Implementación de respaldo
+                    const notificacion = document.createElement('div');
+                    notificacion.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                        tipo === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                    }`;
+                    notificacion.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                            <span>${mensaje}</span>
+                        </div>
+                    `;
+
+                    document.body.appendChild(notificacion);
+
+                    setTimeout(() => {
+                        notificacion.remove();
+                    }, 3000);
+                }
+            }
+        });
+    </script>
+
+    <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Animaciones personalizadas */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</div>
+
 </body>
 </html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - PeriTech">PeriTech - Tienda de Periféricos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+
+<!-- Header -->
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+            <!-- Logo -->
+            <a th:href="@{/}" class="text-2xl font-bold text-blue-600 flex items-center">
+                <i class="fas fa-keyboard mr-2"></i>PeriTech
+            </a>
+
+            <!-- Menú Principal - DIFERENTE para ADMIN vs USER/ANÓNIMO -->
+            <div class="hidden md:flex space-x-8">
+                <!-- PARA USUARIOS NORMALES Y NO AUTENTICADOS -->
+                <div sec:authorize="!hasRole('ADMIN')">
+                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 transition duration-300">Inicio</a>
+                    <a th:href="@{/productos/tienda}" class="text-gray-700 hover:text-blue-600 transition duration-300">Tienda</a>
+                    <a th:href="@{/nosotros}" class="text-gray-700 hover:text-blue-600 transition duration-300">Nosotros</a>
+                    <a th:href="@{/contacto}" class="text-gray-700 hover:text-blue-600 transition duration-300">Contacto</a>
+                </div>
+
+                <!-- SOLO PARA ADMINISTRADORES -->
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/dashboard}"
+                       class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300">
+                        <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+                    </a>
+                    <a th:href="@{/admin/productos}"
+                       class="text-gray-700 hover:text-blue-600 transition duration-300">
+                        <i class="fas fa-box mr-1"></i>Productos
+                    </a>
+                    <a th:href="@{/admin/pedidos}"
+                       class="text-gray-700 hover:text-blue-600 transition duration-300">
+                        <i class="fas fa-shopping-bag mr-1"></i>Pedidos
+                    </a>
+                    <a th:href="@{/admin/usuarios}"
+                       class="text-gray-700 hover:text-blue-600 transition duration-300">
+                        <i class="fas fa-users mr-1"></i>Usuarios
+                    </a>
+                    <a th:href="@{/admin/estadisticas}"
+                       class="text-gray-700 hover:text-blue-600 transition duration-300">
+                        <i class="fas fa-chart-bar mr-1"></i>Estadísticas
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Carrito - SOLO para USUARIOS NORMALES, NO para ADMIN -->
+                <a sec:authorize="hasRole('USER')" th:href="@{/carrito}"
+                   class="text-gray-700 hover:text-blue-600 relative transition duration-300">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-count"
+                          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center transition-all duration-300 transform scale-100 hidden">
+                        0
+                    </span>
+                </a>
+
+                <!-- Usuario Autenticado -->
+                <div sec:authorize="isAuthenticated()">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+                                <i class="fas fa-user-circle text-xl"></i>
+                                <span sec:authentication="name" class="hidden sm:inline"></span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+
+                            <!-- Dropdown Menu CORREGIDO - Diferente para ADMIN vs USER -->
+                            <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 hidden group-hover:block z-50 border border-gray-200">
+
+                                <!-- PARA ADMINISTRADORES -->
+                                <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                    <div class="px-4 py-2 bg-blue-50 border-b border-blue-100">
+                                        <p class="text-sm font-semibold text-blue-800">Administrador</p>
+                                    </div>
+
+                                    <a th:href="@{/admin/dashboard}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                                    </a>
+
+                                    <a th:href="@{/admin/productos}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-box mr-2"></i>Gestionar Productos
+                                    </a>
+
+                                    <a th:href="@{/admin/categorias}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-tags mr-2"></i>Gestionar Categorías
+                                    </a>
+
+                                    <a th:href="@{/admin/pedidos}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-list-alt mr-2"></i>Gestionar Pedidos
+                                    </a>
+
+                                    <a th:href="@{/admin/usuarios}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-users mr-2"></i>Gestionar Usuarios
+                                    </a>
+
+                                    <a th:href="@{/admin/estadisticas}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-chart-bar mr-2"></i>Estadísticas
+                                    </a>
+
+                                    <div class="border-t my-1"></div>
+                                </div>
+
+                                <!-- PARA USUARIOS NORMALES -->
+                                <div th:if="${#authorization.expression('hasRole(''USER'')')}">
+                                    <div class="px-4 py-2 bg-green-50 border-b border-green-100">
+                                        <p class="text-sm font-semibold text-green-800">Cliente</p>
+                                    </div>
+
+                                    <a th:href="@{/user/dashboard}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-tachometer-alt mr-2"></i>Mi Dashboard
+                                    </a>
+
+                                    <a th:href="@{/user/perfil}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-user mr-2"></i>Mi Perfil
+                                    </a>
+
+                                    <a th:href="@{/pedidos/historial}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-history mr-2"></i>Mis Pedidos
+                                    </a>
+
+                                    <a th:href="@{/carrito}"
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                        <i class="fas fa-shopping-cart mr-2"></i>Mi Carrito
+                                    </a>
+
+                                    <div class="border-t my-1"></div>
+                                </div>
+
+                                <!-- Opciones comunes para ambos roles -->
+                                <a th:href="@{/user/configuracion}"
+                                   class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300">
+                                    <i class="fas fa-cog mr-2"></i>Configuración
+                                </a>
+
+                                <!-- LOGOUT FORM -->
+                                <form th:action="@{/auth/logout}" method="post" class="block m-0">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition duration-300">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuario No Autenticado -->
+                <div sec:authorize="!isAuthenticated()">
+                    <div class="flex space-x-3">
+                        <a th:href="@{/auth/login}" class="text-gray-700 hover:text-blue-600 transition duration-300">Ingresar</a>
+                        <a th:href="@{/auth/registro}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300">
+                            Registrarse
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Mensajes Globales -->
+<div layout:fragment="mensajes">
+    <div class="container mx-auto px-4 mt-4">
+        <div th:if="${mensaje}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Contenido Principal -->
+<main layout:fragment="content">
+    <!-- El contenido específico de cada página va aquí -->
+</main>
+
+<!-- Footer - TAMBIÉN DIFERENTE para ADMIN -->
+<footer class="bg-gray-800 text-white mt-12">
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-lg font-semibold mb-4">PeriTech</h3>
+                <p class="text-gray-400" sec:authorize="!hasRole('ADMIN')">
+                    Tu tienda de confianza para periféricos y tecnología de última generación.
+                </p>
+                <p class="text-gray-400" sec:authorize="hasRole('ADMIN')">
+                    Panel de Administración - PeriTech
+                </p>
+            </div>
+
+            <!-- Enlaces del Footer - DIFERENTES para ADMIN vs USER -->
+            <div sec:authorize="!hasRole('ADMIN')">
+                <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a th:href="@{/}" class="hover:text-white transition duration-300">Inicio</a></li>
+                    <li><a th:href="@{/productos/tienda}" class="hover:text-white transition duration-300">Tienda</a></li>
+                    <li><a th:href="@{/nosotros}" class="hover:text-white transition duration-300">Nosotros</a></li>
+                    <li><a th:href="@{/contacto}" class="hover:text-white transition duration-300">Contacto</a></li>
+                </ul>
+            </div>
+
+            <div sec:authorize="hasRole('ADMIN')">
+                <h3 class="text-lg font-semibold mb-4">Administración</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a th:href="@{/admin/dashboard}" class="hover:text-white transition duration-300">Dashboard</a></li>
+                    <li><a th:href="@{/admin/productos}" class="hover:text-white transition duration-300">Productos</a></li>
+                    <li><a th:href="@{/admin/pedidos}" class="hover:text-white transition duration-300">Pedidos</a></li>
+                    <li><a th:href="@{/admin/usuarios}" class="hover:text-white transition duration-300">Usuarios</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Soporte</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition duration-300">Centro de Ayuda</a></li>
+                    <li><a href="#" class="hover:text-white transition duration-300">Términos de Servicio</a></li>
+                    <li><a href="#" class="hover:text-white transition duration-300">Política de Privacidad</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Contacto</h3>
+                <div class="space-y-2 text-gray-400">
+                    <p><i class="fas fa-envelope mr-2"></i> info@peritech.com</p>
+                    <p><i class="fas fa-phone mr-2"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-map-marker-alt mr-2"></i> Ciudad, País</p>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+            <p>&copy; 2024 PeriTech. Todos los derechos reservados.</p>
+            <p sec:authorize="hasRole('ADMIN')" class="text-sm mt-1 text-yellow-400">
+                <i class="fas fa-shield-alt mr-1"></i>Modo Administrador
+            </p>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts Globales - Actualizado para ADMIN -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cerrar dropdowns al hacer click fuera
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.group')) {
+                document.querySelectorAll('.group .absolute').forEach(dropdown => {
+                    dropdown.classList.add('hidden');
+                });
+            }
+        });
+
+        // Forzar mostrar el dropdown al hacer hover
+        const userButtons = document.querySelectorAll('.group button');
+        userButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                const dropdown = this.closest('.group').querySelector('.absolute');
+                if (dropdown) {
+                    dropdown.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Solo ejecutar funciones de carrito si el usuario es USER (no ADMIN)
+        const cartCount = document.getElementById('cart-count');
+        if (cartCount) {
+            actualizarContadorCarrito();
+            setInterval(actualizarContadorCarrito, 30000);
+        }
+    });
+
+    function actualizarContadorCarrito() {
+        const cartCount = document.getElementById('cart-count');
+        if (!cartCount) return;
+
+        const originalContent = cartCount.textContent;
+        cartCount.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i>';
+
+        fetch('/carrito/contador')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(count => {
+                cartCount.textContent = count;
+
+                cartCount.classList.add('scale-110', 'bg-green-500');
+                setTimeout(() => {
+                    cartCount.classList.remove('scale-110', 'bg-green-500');
+                    cartCount.classList.add('bg-red-500');
+                }, 300);
+
+                if (count === '0') {
+                    cartCount.classList.add('hidden');
+                } else {
+                    cartCount.classList.remove('hidden');
+
+                    if (parseInt(count) > 9) {
+                        cartCount.classList.add('w-6', 'h-6', '-top-3', '-right-3');
+                        cartCount.classList.remove('w-5', 'h-5', '-top-2', '-right-2');
+                    } else {
+                        cartCount.classList.add('w-5', 'h-5', '-top-2', '-right-2');
+                        cartCount.classList.remove('w-6', 'h-6', '-top-3', '-right-3');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error actualizando contador del carrito:', error);
+                cartCount.textContent = originalContent;
+                cartCount.classList.add('bg-red-500');
+            });
+    }
+
+    window.actualizarContadorCarrito = actualizarContadorCarrito;
+</script>
+</body>
+</html>

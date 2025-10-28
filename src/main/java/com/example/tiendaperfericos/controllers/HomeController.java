@@ -17,24 +17,36 @@ public class HomeController {
 
     private final ProductoServiceImpl productoService;
 
-    @GetMapping("/")
+    @GetMapping({"", "/", "/home"})
     public String home(Model model) {
         try {
+            model.addAttribute("title", "Inicio");
             model.addAttribute("productosDestacados", productoService.findProductosDestacados());
+            model.addAttribute("totalProductos", productoService.countProductosActivos());
             return "home";
         } catch (Exception e) {
             log.error("Error al cargar página de inicio: {}", e.getMessage());
+            model.addAttribute("title", "Inicio");
+            model.addAttribute("error", "Error al cargar los productos destacados");
             return "home";
         }
     }
 
     @GetMapping("/contacto")
-    public String contacto() {
+    public String contacto(Model model) {
+        model.addAttribute("title", "Contacto");
         return "contacto";
     }
 
     @GetMapping("/nosotros")
-    public String nosotros() {
+    public String nosotros(Model model) {
+        model.addAttribute("title", "Nosotros");
         return "nosotros";
+    }
+
+    @GetMapping("/error")
+    public String error(Model model) {
+        model.addAttribute("title", "Error");
+        return "error";
     }
 }

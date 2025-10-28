@@ -65,15 +65,16 @@ public class AdminController {
         return "admin/productos/lista";
     }
 
+
     @PostMapping("/productos/guardar")
     public String guardarProducto(@ModelAttribute Producto producto,
-                                  Model redirectAttributes) {
+                                  RedirectAttributes redirectAttributes) { // ✅ BIEN
+
         try {
             productoService.save(producto);
-            redirectAttributes.addAttribute("mensaje", "Producto guardado exitosamente");
+            redirectAttributes.addFlashAttribute("mensaje", "Producto guardado exitosamente");
         } catch (Exception e) {
-            log.error("Error al guardar producto: {}", e.getMessage());
-            redirectAttributes.addAttribute("error", "Error al guardar producto");
+            redirectAttributes.addFlashAttribute("error", "Error al guardar producto");
         }
         return "redirect:/admin/productos";
     }
@@ -98,7 +99,7 @@ public class AdminController {
     @PostMapping("/productos/actualizar/{id}")
     public String actualizarProducto(@PathVariable Long id,
                                      @ModelAttribute Producto producto,
-                                     Model redirectAttributes) {
+                                     RedirectAttributes redirectAttributes) {
         try {
             producto.setId(id);
             productoService.save(producto);
@@ -111,7 +112,7 @@ public class AdminController {
     }
 
     @PostMapping("/productos/eliminar/{id}")
-    public String eliminarProducto(@PathVariable Long id, Model redirectAttributes) {
+    public String eliminarProducto(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             productoService.deleteById(id);
             redirectAttributes.addAttribute("mensaje", "Producto eliminado exitosamente");
@@ -133,7 +134,7 @@ public class AdminController {
 
     @PostMapping("/categorias/guardar")
     public String guardarCategoria(@ModelAttribute Categoria categoria,
-                                   Model redirectAttributes) {
+                                   RedirectAttributes redirectAttributes) {
         try {
             categoriaService.save(categoria);
             redirectAttributes.addAttribute("mensaje", "Categoría guardada exitosamente");
@@ -145,7 +146,7 @@ public class AdminController {
     }
 
     @PostMapping("/categorias/eliminar/{id}")
-    public String eliminarCategoria(@PathVariable Long id, Model redirectAttributes) {
+    public String eliminarCategoria(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             categoriaService.deleteById(id);
             redirectAttributes.addAttribute("mensaje", "Categoría eliminada exitosamente");
@@ -184,13 +185,13 @@ public class AdminController {
     @PostMapping("/pedidos/actualizar-estado/{id}")
     public String actualizarEstadoPedido(@PathVariable Long id,
                                          @RequestParam EstadoPedido nuevoEstado,
-                                         Model redirectAttributes) {
+                                         RedirectAttributes redirectAttributes) {
         try {
             pedidoService.actualizarEstado(id, nuevoEstado);
-            redirectAttributes.addAttribute("mensaje", "Estado del pedido actualizado exitosamente");
+            redirectAttributes.addFlashAttribute("mensaje", "Estado del pedido actualizado exitosamente");
         } catch (Exception e) {
             log.error("Error al actualizar estado del pedido: {}", e.getMessage());
-            redirectAttributes.addAttribute("error", "Error al actualizar estado del pedido");
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar estado del pedido");
         }
         return "redirect:/admin/pedidos/detalle/" + id;
     }
@@ -205,14 +206,14 @@ public class AdminController {
     @PostMapping("/usuarios/cambiar-estado/{id}")
     public String cambiarEstadoUsuario(@PathVariable Long id,
                                        @RequestParam boolean activo,
-                                       Model redirectAttributes) {
+                                       RedirectAttributes redirectAttributes) {
         try {
             usuarioService.cambiarEstadoUsuarios(id, activo);
             String mensaje = activo ? "Usuario activado exitosamente" : "Usuario desactivado exitosamente";
-            redirectAttributes.addAttribute("mensaje", mensaje);
+            redirectAttributes.addFlashAttribute("mensaje", mensaje);
         } catch (Exception e) {
             log.error("Error al cambiar estado de usuario: {}", e.getMessage());
-            redirectAttributes.addAttribute("error", "Error al cambiar estado de usuario");
+            redirectAttributes.addFlashAttribute("error", "Error al cambiar estado de usuario");
         }
         return "redirect:/admin/usuarios";
     }

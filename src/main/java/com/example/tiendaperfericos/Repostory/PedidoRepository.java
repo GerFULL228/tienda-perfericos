@@ -51,4 +51,14 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query("SELECT p FROM Pedido p WHERE p.usuario.email = :email ORDER BY p.fechaPedido DESC")
     List<Pedido> findByUsuarioEmail(@Param("email") String email);
+
+    @Query(value = "SELECT MONTH(p.fecha_pedido) as mes, " +
+            "COALESCE(SUM(p.total), 0) as total_ventas, " +
+            "COUNT(p.id) as total_pedidos " +
+            "FROM pedidos p " +
+            "WHERE YEAR(p.fecha_pedido) = :year AND p.estado = 'ENTREGADO' " +
+            "GROUP BY MONTH(p.fecha_pedido) " +
+            "ORDER BY mes", nativeQuery = true)
+    List<Object[]> getVentasMensuales(@Param("year") int year);
+
 }
